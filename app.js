@@ -49,8 +49,8 @@ let appRooms = {};
 let currentRoomId = '101';
 let currentSearchTerm = '';
 
-const STORAGE_SETTINGS_KEY = 'quirama_hotel_settings_v3';
-const STORAGE_ROOMS_KEY = 'quirama_hotel_rooms_v3';
+const STORAGE_SETTINGS_KEY = 'quirama_hotel_settings_v4';
+const STORAGE_ROOMS_KEY = 'quirama_hotel_rooms_v4';
 
 // ==============================================================
 // 3. INICIALIZACIÓN
@@ -66,14 +66,18 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initLucide() {
-  if (window.lucide) {
-    window.lucide.createIcons();
+  try {
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+      window.lucide.createIcons();
+    }
+  } catch (err) {
+    console.warn('Icon render notice:', err);
   }
 }
 
 function loadSettings() {
   try {
-    const saved = localStorage.getItem(STORAGE_SETTINGS_KEY);
+    const saved = localStorage.getItem(STORAGE_SETTINGS_KEY) || localStorage.getItem('quirama_hotel_settings_v3');
     if (saved) {
       appSettings = { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
     } else {
@@ -95,13 +99,18 @@ function saveSettingsToStorage() {
   }
 }
 
+function safeUpper(str, fallback = '') {
+  if (typeof str !== 'string' || !str) return fallback;
+  return str.toUpperCase();
+}
+
 function applySettingsToUI() {
   const headerTitle = document.getElementById('header-hotel-title');
-  if (headerTitle) headerTitle.textContent = appSettings.hotelName;
+  if (headerTitle) headerTitle.textContent = appSettings.hotelName || 'Hotel Recinto Quirama';
 
   const headerSub = document.getElementById('header-hotel-subtitle');
   if (headerSub) {
-    headerSub.innerHTML = `<span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-300 animate-pulse"></span>${appSettings.entityName} · Control de Inventario`;
+    headerSub.innerHTML = `<span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-300 animate-pulse"></span>${appSettings.entityName || 'Comfenalco Antioquia'} · Control de Inventario`;
   }
 
   const logoSrc = appSettings.logo || 'logo-default.svg';
@@ -115,18 +124,18 @@ function applySettingsToUI() {
   if (printLogo) printLogo.src = logoSrc;
 
   const printHotel = document.getElementById('print-hotel-name');
-  if (printHotel) printHotel.textContent = appSettings.hotelName.toUpperCase();
+  if (printHotel) printHotel.textContent = safeUpper(appSettings.hotelName, 'HOTEL RECINTO QUIRAMA');
 
   const printEntity = document.getElementById('print-hotel-entity');
-  if (printEntity) printEntity.textContent = appSettings.entityName.toUpperCase();
+  if (printEntity) printEntity.textContent = safeUpper(appSettings.entityName, 'COMFENALCO ANTIOQUIA');
 
   const printDept = document.getElementById('print-hotel-dept');
-  if (printDept) printDept.textContent = appSettings.department.toUpperCase();
+  if (printDept) printDept.textContent = safeUpper(appSettings.department, 'DEPARTAMENTO DE AMA DE LLAVES');
 }
 
 function loadRooms() {
   try {
-    const saved = localStorage.getItem(STORAGE_ROOMS_KEY);
+    const saved = localStorage.getItem(STORAGE_ROOMS_KEY) || localStorage.getItem('quirama_hotel_rooms_v3');
     if (saved) {
       appRooms = JSON.parse(saved);
     } else {
@@ -194,7 +203,67 @@ function saveRoomsToStorage() {
 }
 
 // ==============================================================
-// 4. CONTROL DE HABITACIÓN ACTIVA
+// 4. SINCRONIZACIÓN Y GUARDADO DE DATOS (DOM -> ESTADO)
+// ==============================================================
+function syncCurrentRoomFromDOM() {
+  const room = appRooms[currentRoomId];
+  if (!room) return;
+
+  const typeInput = document.getElementById('room-type-input');
+  if (typeInput) room.type = typeInput.value;
+
+  const hkInput = document.getElementById('room-housekeeper-input');
+  if (hkInput) room.housekeeper = hkInput.value.trim();
+
+  const audInput = document.getElementById('room-auditor-input');
+  if (audInput) room.auditor = audInput.value.trim();
+
+  const dateInput = document.getElementById('room-date-input');
+  if (dateInput && dateInput.value) room.date = dateInput.value;
+
+  const notesInput = document.getElementById('room-general-notes');
+  if (notesInput) room.notes = notesInput.value.trim();
+
+  recalculateRoomStatus(room);
+}
+
+function saveCurrentRoomManual() {
+  try {
+    syncCurrentRoomFromDOM();
+    saveRoomsToStorage();
+    populateRoomSelect();
+    updateGlobalStats();
+    renderActiveRoom();
+
+    // Animación y confirmación en el botón Guardar
+    const saveBtn = document.getElementById('btn-save-room');
+    if (saveBtn) {
+      const originalHTML = saveBtn.innerHTML;
+      saveBtn.innerHTML = `
+        <i data-lucide="check-circle" class="w-4 h-4 text-white"></i>
+        <span>¡Guardado Exitoso!</span>
+      `;
+      saveBtn.classList.remove('bg-brand-600', 'hover:bg-brand-700');
+      saveBtn.classList.add('bg-emerald-800');
+      initLucide();
+
+      setTimeout(() => {
+        saveBtn.innerHTML = originalHTML;
+        saveBtn.classList.remove('bg-emerald-800');
+        saveBtn.classList.add('bg-brand-600', 'hover:bg-brand-700');
+        initLucide();
+      }, 2000);
+    }
+
+    showToast(`✅ Habitación ${currentRoomId} guardada con éxito`, 'success');
+  } catch (err) {
+    console.error('Error guardando habitación:', err);
+    alert('Ocurrió un error al guardar: ' + err.message);
+  }
+}
+
+// ==============================================================
+// 5. NAVEGACIÓN Y CONTROL DE HABITACIÓN ACTIVA
 // ==============================================================
 function populateRoomSelect() {
   const select = document.getElementById('room-select');
@@ -218,6 +287,9 @@ function populateRoomSelect() {
 
 function changeActiveRoom(newId) {
   if (!appRooms[newId]) return;
+  syncCurrentRoomFromDOM();
+  saveRoomsToStorage();
+
   currentRoomId = newId;
   const select = document.getElementById('room-select');
   if (select) select.value = newId;
@@ -225,6 +297,9 @@ function changeActiveRoom(newId) {
 }
 
 function navigateRoom(delta) {
+  syncCurrentRoomFromDOM();
+  saveRoomsToStorage();
+
   const roomIds = Object.keys(appRooms).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
   const currentIndex = roomIds.indexOf(currentRoomId);
   if (currentIndex === -1) return;
@@ -242,23 +317,13 @@ function setCurrentDateTime() {
     const now = new Date();
     const localIso = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
     dateInput.value = localIso;
-    updateRoomMetadata('date', localIso);
+    syncCurrentRoomFromDOM();
+    saveRoomsToStorage();
   }
-}
-
-function updateRoomMetadata(field, value) {
-  const room = appRooms[currentRoomId];
-  if (!room) return;
-
-  room[field] = value;
-  if (room.status === 'pending' && (room.housekeeper || room.auditor)) {
-    recalculateRoomStatus(room);
-  }
-  saveRoomsToStorage();
 }
 
 // ==============================================================
-// 5. RENDERIZADO DE TABLA DE INVENTARIO
+// 6. RENDERIZADO DE TABLA DE INVENTARIO
 // ==============================================================
 function renderActiveRoom() {
   const room = appRooms[currentRoomId];
@@ -419,7 +484,7 @@ function getStatusSelectClass(status) {
 }
 
 // ==============================================================
-// 6. OPERACIONES SOBRE ELEMENTOS
+// 7. OPERACIONES SOBRE ELEMENTOS
 // ==============================================================
 function modifyItemQty(itemId, delta) {
   const room = appRooms[currentRoomId];
@@ -507,7 +572,7 @@ function recalculateRoomStatus(room) {
   if (!room) return;
 
   let hasDiscrepancy = false;
-  for (const item of room.items) {
+  for (const item of (room.items || [])) {
     if (item.actualQty !== item.standardQty || item.status !== 'Completo / Buen estado') {
       hasDiscrepancy = true;
       break;
@@ -608,15 +673,319 @@ function resetCurrentRoomToStandard() {
   showToast(`Habitación ${currentRoomId} restablecida`, 'success');
 }
 
-function saveCurrentRoomManual() {
-  saveRoomsToStorage();
-  populateRoomSelect();
-  updateGlobalStats();
-  showToast(`Habitación ${currentRoomId} guardada con éxito`, 'success');
+// ==============================================================
+// 8. ACCIONES DIRECTAS DE IMPRESIÓN Y PDF
+// ==============================================================
+function directPrintRoom() {
+  try {
+    syncCurrentRoomFromDOM();
+    saveRoomsToStorage();
+    updatePrintPreview();
+    window.print();
+  } catch (err) {
+    console.error('Error en directPrintRoom:', err);
+    window.print();
+  }
+}
+
+function directExportPDF() {
+  try {
+    syncCurrentRoomFromDOM();
+    saveRoomsToStorage();
+    executePDFExport();
+  } catch (err) {
+    console.error('Error en directExportPDF:', err);
+    executePDFExport();
+  }
 }
 
 // ==============================================================
-// 7. MODAL: AGREGAR ELEMENTO
+// 9. MODAL: CONFIGURAR DOCUMENTO DE IMPRESIÓN, PDF Y FIRMAS
+// ==============================================================
+function openPrintModal() {
+  try {
+    syncCurrentRoomFromDOM();
+    const modal = document.getElementById('modal-print-config');
+    if (!modal) return;
+
+    const room = appRooms[currentRoomId];
+
+    const hotelIn = document.getElementById('doc-hotel-input');
+    if (hotelIn) hotelIn.value = safeUpper(appSettings.hotelName, 'HOTEL RECINTO QUIRAMA');
+
+    const entityIn = document.getElementById('doc-entity-input');
+    if (entityIn) entityIn.value = safeUpper(appSettings.entityName, 'COMFENALCO ANTIOQUIA');
+
+    const deptIn = document.getElementById('doc-dept-input');
+    if (deptIn) deptIn.value = safeUpper(appSettings.department, 'DEPARTAMENTO DE AMA DE LLAVES');
+
+    const notesIn = document.getElementById('doc-notes-input');
+    if (notesIn) notesIn.value = (room && room.notes) ? room.notes : '';
+
+    const sign1Name = document.getElementById('sign1-name');
+    if (sign1Name && room) sign1Name.value = room.housekeeper || '';
+
+    const sign2Name = document.getElementById('sign2-name');
+    if (sign2Name && room) sign2Name.value = room.auditor || '';
+
+    updatePrintPreview();
+    modal.classList.remove('hidden');
+    initLucide();
+  } catch (err) {
+    console.error('Error en openPrintModal:', err);
+    directPrintRoom();
+  }
+}
+
+function closePrintModal() {
+  const modal = document.getElementById('modal-print-config');
+  if (modal) modal.classList.add('hidden');
+}
+
+function updatePrintPreview() {
+  try {
+    const room = appRooms[currentRoomId];
+    if (!room) return;
+
+    const printable = document.getElementById('printable-report');
+    if (!printable) return;
+
+    // 1. Tamaño de la letra
+    const fontSizeSelect = document.getElementById('doc-font-size');
+    const selectedSize = fontSizeSelect ? fontSizeSelect.value : 'report-font-large';
+    printable.classList.remove('report-font-large', 'report-font-xlarge', 'report-font-normal');
+    printable.classList.add(selectedSize);
+
+    // 2. Encabezados
+    const titleIn = document.getElementById('doc-title-input');
+    const printTitle = document.getElementById('print-main-title');
+    if (printTitle) printTitle.textContent = safeUpper(titleIn ? titleIn.value : '', 'CONTROL DE INVENTARIO Y DOTACIÓN');
+
+    const codeIn = document.getElementById('doc-code-input');
+    const printCode = document.getElementById('print-doc-code');
+    if (printCode) printCode.textContent = (codeIn && codeIn.value) ? `Código: ${codeIn.value}` : 'Código: F-REC-INV-01';
+
+    const hotelIn = document.getElementById('doc-hotel-input');
+    const printHotel = document.getElementById('print-hotel-name');
+    if (printHotel) printHotel.textContent = safeUpper(hotelIn ? hotelIn.value : appSettings.hotelName, 'HOTEL RECINTO QUIRAMA');
+
+    const entityIn = document.getElementById('doc-entity-input');
+    const printEntity = document.getElementById('print-hotel-entity');
+    if (printEntity) printEntity.textContent = safeUpper(entityIn ? entityIn.value : appSettings.entityName, 'COMFENALCO ANTIOQUIA');
+
+    const deptIn = document.getElementById('doc-dept-input');
+    const printDept = document.getElementById('print-hotel-dept');
+    if (printDept) printDept.textContent = safeUpper(deptIn ? deptIn.value : appSettings.department, 'DEPARTAMENTO DE AMA DE LLAVES');
+
+    // 3. Datos de la Habitación
+    const roomNum = document.getElementById('print-room-number');
+    if (roomNum) roomNum.textContent = room.id;
+
+    const roomType = document.getElementById('print-room-type');
+    if (roomType) roomType.textContent = room.type || 'Estándar';
+
+    const roomDate = document.getElementById('print-room-date');
+    if (roomDate) {
+      const d = room.date ? new Date(room.date) : new Date();
+      roomDate.textContent = isNaN(d.getTime()) ? room.date : d.toLocaleString('es-CO');
+    }
+
+    const roomStatus = document.getElementById('print-room-status');
+    if (roomStatus) {
+      if (room.status === 'ok') {
+        roomStatus.textContent = 'CONFORME (TODO OK)';
+        roomStatus.style.color = '#008848';
+      } else if (room.status === 'warn') {
+        roomStatus.textContent = 'CON NOVEDADES / FALTANTES';
+        roomStatus.style.color = '#D97706';
+      } else {
+        roomStatus.textContent = 'SIN INSPECCIÓN';
+        roomStatus.style.color = '#475569';
+      }
+    }
+
+    // 4. Modo de Contenido de la Tabla (Todo vs Solo Novedades)
+    const modeSelect = document.getElementById('doc-content-mode');
+    const onlyIssues = modeSelect && modeSelect.value === 'only-issues';
+
+    const tbody = document.getElementById('print-table-tbody');
+    if (tbody) {
+      tbody.innerHTML = '';
+      let itemsToPrint = room.items || [];
+
+      if (onlyIssues) {
+        itemsToPrint = itemsToPrint.filter(i => i.actualQty !== i.standardQty || i.status !== 'Completo / Buen estado');
+      }
+
+      if (itemsToPrint.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td colspan="5" style="text-align: center; padding: 25px; font-size: 13pt; font-weight: bold; color: #008848;">
+            ✅ Toda la dotación de la Habitación ${room.id} se encuentra completa y en perfecto estado (Sin novedades).
+          </td>
+        `;
+        tbody.appendChild(tr);
+      } else {
+        itemsToPrint.forEach((item, idx) => {
+          const tr = document.createElement('tr');
+          const isOk = item.actualQty === item.standardQty && item.status === 'Completo / Buen estado';
+
+          let badgeHtml = '';
+          if (isOk) {
+            badgeHtml = '<span class="report-badge-ok">✅ OK</span>';
+          } else if (item.status === 'Faltante' || item.actualQty < item.standardQty) {
+            badgeHtml = '<span class="report-badge-warn">❌ FALTANTE</span>';
+          } else if (item.status === 'Dañado') {
+            badgeHtml = '<span class="report-badge-warn">⚠️ DAÑADO</span>';
+          } else if (item.status === 'Manchado / Sucio') {
+            badgeHtml = '<span class="report-badge-warn">🧺 MANCHADO</span>';
+          } else {
+            badgeHtml = `<span class="report-badge-warn">${escapeHTML(item.status)}</span>`;
+          }
+
+          let obsText = item.observation && item.observation.trim() ? item.observation : (isOk ? 'Sin novedad' : 'Verificar reposición');
+
+          tr.innerHTML = `
+            <td style="text-align: center; font-weight: bold; color: #475569; width: 35px;">${idx + 1}</td>
+            <td style="font-weight: 800; color: #0F172A; font-size: 11.5pt;">${escapeHTML(item.name)}</td>
+            <td style="text-align: center; font-weight: 900; font-size: 12pt; color: ${isOk ? '#008848' : '#D97706'};">${item.actualQty}</td>
+            <td style="text-align: center;">${badgeHtml}</td>
+            <td style="font-size: 10.5pt; color: #1E293B; font-weight: ${isOk ? 'normal' : 'bold'};">${escapeHTML(obsText)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
+
+    // 5. Observaciones del Documento
+    const notesIn = document.getElementById('doc-notes-input');
+    const printNotes = document.getElementById('print-room-notes');
+    if (printNotes) {
+      const generalNotes = (notesIn && notesIn.value) ? notesIn.value : (room.notes || '');
+      printNotes.textContent = generalNotes.trim() ? generalNotes : 'Sin novedades adicionales reportadas.';
+    }
+
+    // 6. Firmas Personalizables
+    applySignatureBlock('1');
+    applySignatureBlock('2');
+    applySignatureBlock('3');
+
+    const signContainer = document.getElementById('print-signatures-container');
+    if (signContainer) {
+      const s1 = document.getElementById('sign1-enable') ? document.getElementById('sign1-enable').checked : true;
+      const s2 = document.getElementById('sign2-enable') ? document.getElementById('sign2-enable').checked : true;
+      const s3 = document.getElementById('sign3-enable') ? document.getElementById('sign3-enable').checked : true;
+      const activeCount = (s1 ? 1 : 0) + (s2 ? 1 : 0) + (s3 ? 1 : 0);
+      signContainer.style.gridTemplateColumns = `repeat(${Math.max(1, activeCount)}, 1fr)`;
+    }
+  } catch (err) {
+    console.error('Error en updatePrintPreview:', err);
+  }
+}
+
+function applySignatureBlock(num) {
+  const enableEl = document.getElementById(`sign${num}-enable`);
+  const enable = enableEl ? enableEl.checked : true;
+  const box = document.getElementById(`print-sign-${num}-box`);
+  if (!box) return;
+
+  if (!enable) {
+    box.style.display = 'none';
+    return;
+  }
+  box.style.display = 'block';
+
+  const roleIn = document.getElementById(`sign${num}-role`);
+  const nameIn = document.getElementById(`sign${num}-name`);
+  const idIn = document.getElementById(`sign${num}-id`);
+
+  const roleEl = document.getElementById(`print-sign-${num}-role`);
+  if (roleEl) roleEl.textContent = (roleIn && roleIn.value) ? roleIn.value : 'Firma';
+
+  const nameEl = document.getElementById(`print-sign-${num}-name`);
+  if (nameEl) nameEl.textContent = (nameIn && nameIn.value && nameIn.value.trim()) ? nameIn.value.trim().toUpperCase() : '___________________';
+
+  const idEl = document.getElementById(`print-sign-${num}-id`);
+  if (idEl) idEl.textContent = (idIn && idIn.value && idIn.value.trim()) ? `C.C. ${idIn.value.trim()}` : 'C.C. ___________________';
+}
+
+function executePDFExport() {
+  try {
+    updatePrintPreview();
+    const element = document.getElementById('printable-report');
+    if (!element) {
+      alert('Error: no se encontró el reporte.');
+      return;
+    }
+
+    showToast('Generando documento PDF...', 'info');
+    element.style.display = 'block';
+
+    const opt = {
+      margin: [8, 8, 8, 8],
+      filename: `Inventario_Habitacion_${currentRoomId}_Quirama.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
+      jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
+    };
+
+    if (typeof html2pdf !== 'undefined') {
+      html2pdf().set(opt).from(element).save().then(() => {
+        element.style.display = 'none';
+        showToast('¡PDF descargado con éxito!', 'success');
+      }).catch(err => {
+        element.style.display = 'none';
+        console.error('Error con html2pdf:', err);
+        fallbackPrintAsPDF();
+      });
+    } else {
+      element.style.display = 'none';
+      fallbackPrintAsPDF();
+    }
+  } catch (err) {
+    console.error('Error en executePDFExport:', err);
+    fallbackPrintAsPDF();
+  }
+}
+
+function fallbackPrintAsPDF() {
+  alert('Se abrirá la ventana de impresión del navegador. Puedes seleccionar "Guardar como PDF".');
+  window.print();
+}
+
+function executeImageExport() {
+  try {
+    updatePrintPreview();
+    const element = document.getElementById('printable-report');
+    if (!element) return;
+
+    showToast('Generando imagen de alta resolución...', 'info');
+    element.style.display = 'block';
+
+    if (typeof html2canvas !== 'undefined') {
+      html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+        element.style.display = 'none';
+        const link = document.createElement('a');
+        link.download = `Inventario_Habitacion_${currentRoomId}_Quirama.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('¡Imagen descargada con éxito!', 'success');
+      }).catch(err => {
+        element.style.display = 'none';
+        console.error('Error al generar imagen:', err);
+        alert('Error al generar la imagen.');
+      });
+    } else {
+      element.style.display = 'none';
+      alert('Biblioteca de imagen no cargada. Utiliza el botón Imprimir.');
+    }
+  } catch (err) {
+    console.error('Error en executeImageExport:', err);
+  }
+}
+
+// ==============================================================
+// 10. MODAL: AGREGAR ELEMENTO
 // ==============================================================
 function openAddItemModal() {
   const modal = document.getElementById('modal-add-item');
@@ -624,7 +993,8 @@ function openAddItemModal() {
   document.getElementById('form-add-item').reset();
   modal.classList.remove('hidden');
   initLucide();
-  document.getElementById('add-item-name').focus();
+  const nameInput = document.getElementById('add-item-name');
+  if (nameInput) nameInput.focus();
 }
 
 function closeAddItemModal() {
@@ -693,7 +1063,7 @@ function handleAddItemSubmit(e) {
 }
 
 // ==============================================================
-// 8. MODAL: MATRIZ DE 60 HABITACIONES
+// 11. MODAL: MATRIZ DE 60 HABITACIONES
 // ==============================================================
 function openRoomMatrixModal() {
   const modal = document.getElementById('modal-matrix');
@@ -754,264 +1124,7 @@ function closeRoomMatrixModal() {
 }
 
 // ==============================================================
-// 9. MODAL: CONFIGURAR DOCUMENTO DE IMPRESIÓN, PDF Y FIRMAS
-// ==============================================================
-function openPrintModal() {
-  const modal = document.getElementById('modal-print-config');
-  if (!modal) return;
-
-  const room = appRooms[currentRoomId];
-
-  // Poblar valores por defecto
-  const hotelIn = document.getElementById('doc-hotel-input');
-  if (hotelIn) hotelIn.value = appSettings.hotelName.toUpperCase();
-
-  const entityIn = document.getElementById('doc-entity-input');
-  if (entityIn) entityIn.value = appSettings.entityName.toUpperCase();
-
-  const deptIn = document.getElementById('doc-dept-input');
-  if (deptIn) deptIn.value = appSettings.department.toUpperCase();
-
-  const notesIn = document.getElementById('doc-notes-input');
-  if (notesIn) notesIn.value = (room && room.notes) ? room.notes : '';
-
-  // Nombres en firmas
-  const sign1Name = document.getElementById('sign1-name');
-  if (sign1Name && room) sign1Name.value = room.housekeeper || '';
-
-  const sign2Name = document.getElementById('sign2-name');
-  if (sign2Name && room) sign2Name.value = room.auditor || '';
-
-  updatePrintPreview();
-  modal.classList.remove('hidden');
-  initLucide();
-}
-
-function closePrintModal() {
-  const modal = document.getElementById('modal-print-config');
-  if (modal) modal.classList.add('hidden');
-}
-
-function updatePrintPreview() {
-  const room = appRooms[currentRoomId];
-  if (!room) return;
-
-  const printable = document.getElementById('printable-report');
-  if (!printable) return;
-
-  // 1. Tamaño de la letra
-  const fontSizeSelect = document.getElementById('doc-font-size');
-  const selectedSize = fontSizeSelect ? fontSizeSelect.value : 'report-font-large';
-  printable.classList.remove('report-font-large', 'report-font-xlarge', 'report-font-normal');
-  printable.classList.add(selectedSize);
-
-  // 2. Encabezados
-  const titleIn = document.getElementById('doc-title-input');
-  const printTitle = document.getElementById('print-main-title');
-  if (printTitle) printTitle.textContent = titleIn ? titleIn.value.toUpperCase() : 'CONTROL DE INVENTARIO';
-
-  const codeIn = document.getElementById('doc-code-input');
-  const printCode = document.getElementById('print-doc-code');
-  if (printCode) printCode.textContent = codeIn ? `Código: ${codeIn.value}` : 'Código: F-REC-INV-01';
-
-  const hotelIn = document.getElementById('doc-hotel-input');
-  const printHotel = document.getElementById('print-hotel-name');
-  if (printHotel) printHotel.textContent = hotelIn ? hotelIn.value.toUpperCase() : 'HOTEL RECINTO QUIRAMA';
-
-  const entityIn = document.getElementById('doc-entity-input');
-  const printEntity = document.getElementById('print-hotel-entity');
-  if (printEntity) printEntity.textContent = entityIn ? entityIn.value.toUpperCase() : 'COMFENALCO ANTIOQUIA';
-
-  const deptIn = document.getElementById('doc-dept-input');
-  const printDept = document.getElementById('print-hotel-dept');
-  if (printDept) printDept.textContent = deptIn ? deptIn.value.toUpperCase() : '';
-
-  // 3. Datos de la Habitación
-  const roomNum = document.getElementById('print-room-number');
-  if (roomNum) roomNum.textContent = room.id;
-
-  const roomType = document.getElementById('print-room-type');
-  if (roomType) roomType.textContent = room.type || 'Estándar';
-
-  const roomDate = document.getElementById('print-room-date');
-  if (roomDate) {
-    const d = room.date ? new Date(room.date) : new Date();
-    roomDate.textContent = isNaN(d.getTime()) ? room.date : d.toLocaleString('es-CO');
-  }
-
-  const roomStatus = document.getElementById('print-room-status');
-  if (roomStatus) {
-    if (room.status === 'ok') {
-      roomStatus.textContent = 'CONFORME (TODO OK)';
-      roomStatus.style.color = '#008848';
-    } else if (room.status === 'warn') {
-      roomStatus.textContent = 'CON NOVEDADES / FALTANTES';
-      roomStatus.style.color = '#D97706';
-    } else {
-      roomStatus.textContent = 'SIN INSPECCIÓN';
-      roomStatus.style.color = '#475569';
-    }
-  }
-
-  // 4. Modo de Contenido de la Tabla (Todo vs Solo Novedades)
-  const modeSelect = document.getElementById('doc-content-mode');
-  const onlyIssues = modeSelect && modeSelect.value === 'only-issues';
-
-  const tbody = document.getElementById('print-table-tbody');
-  if (tbody) {
-    tbody.innerHTML = '';
-    let itemsToPrint = room.items || [];
-
-    if (onlyIssues) {
-      itemsToPrint = itemsToPrint.filter(i => i.actualQty !== i.standardQty || i.status !== 'Completo / Buen estado');
-    }
-
-    if (itemsToPrint.length === 0) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td colspan="5" style="text-align: center; padding: 25px; font-size: 13pt; font-weight: bold; color: #008848;">
-          ✅ Toda la dotación de la Habitación ${room.id} se encuentra completa y en perfecto estado (Sin novedades).
-        </td>
-      `;
-      tbody.appendChild(tr);
-    } else {
-      itemsToPrint.forEach((item, idx) => {
-        const tr = document.createElement('tr');
-        const isOk = item.actualQty === item.standardQty && item.status === 'Completo / Buen estado';
-
-        let badgeHtml = '';
-        if (isOk) {
-          badgeHtml = '<span class="report-badge-ok">✅ OK</span>';
-        } else if (item.status === 'Faltante' || item.actualQty < item.standardQty) {
-          badgeHtml = '<span class="report-badge-warn">❌ FALTANTE</span>';
-        } else if (item.status === 'Dañado') {
-          badgeHtml = '<span class="report-badge-warn">⚠️ DAÑADO</span>';
-        } else if (item.status === 'Manchado / Sucio') {
-          badgeHtml = '<span class="report-badge-warn">🧺 MANCHADO</span>';
-        } else {
-          badgeHtml = `<span class="report-badge-warn">${escapeHTML(item.status)}</span>`;
-        }
-
-        let obsText = item.observation && item.observation.trim() ? item.observation : (isOk ? 'Sin novedad' : 'Verificar reposición');
-
-        tr.innerHTML = `
-          <td style="text-align: center; font-weight: bold; color: #475569; width: 35px;">${idx + 1}</td>
-          <td style="font-weight: 800; color: #0F172A; font-size: 11.5pt;">${escapeHTML(item.name)}</td>
-          <td style="text-align: center; font-weight: 900; font-size: 12pt; color: ${isOk ? '#008848' : '#D97706'};">${item.actualQty}</td>
-          <td style="text-align: center;">${badgeHtml}</td>
-          <td style="font-size: 10.5pt; color: #1E293B; font-weight: ${isOk ? 'normal' : 'bold'};">${escapeHTML(obsText)}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-  }
-
-  // 5. Observaciones del Documento
-  const notesIn = document.getElementById('doc-notes-input');
-  const printNotes = document.getElementById('print-room-notes');
-  if (printNotes) {
-    printNotes.textContent = notesIn && notesIn.value.trim() ? notesIn.value : 'Sin novedades adicionales reportadas.';
-  }
-
-  // 6. Firmas Personalizables
-  applySignatureBlock('1');
-  applySignatureBlock('2');
-  applySignatureBlock('3');
-
-  // Ajustar columnas de la caja de firmas según las habilitadas
-  const signContainer = document.getElementById('print-signatures-container');
-  if (signContainer) {
-    const s1 = document.getElementById('sign1-enable').checked;
-    const s2 = document.getElementById('sign2-enable').checked;
-    const s3 = document.getElementById('sign3-enable').checked;
-    const activeCount = (s1 ? 1 : 0) + (s2 ? 1 : 0) + (s3 ? 1 : 0);
-    signContainer.style.gridTemplateColumns = `repeat(${Math.max(1, activeCount)}, 1fr)`;
-  }
-}
-
-function applySignatureBlock(num) {
-  const enable = document.getElementById(`sign${num}-enable`).checked;
-  const box = document.getElementById(`print-sign-${num}-box`);
-  if (!box) return;
-
-  if (!enable) {
-    box.style.display = 'none';
-    return;
-  }
-  box.style.display = 'block';
-
-  const roleIn = document.getElementById(`sign${num}-role`).value;
-  const nameIn = document.getElementById(`sign${num}-name`).value;
-  const idIn = document.getElementById(`sign${num}-id`).value;
-
-  const roleEl = document.getElementById(`print-sign-${num}-role`);
-  if (roleEl) roleEl.textContent = roleIn || 'Firma';
-
-  const nameEl = document.getElementById(`print-sign-${num}-name`);
-  if (nameEl) nameEl.textContent = nameIn ? nameIn.toUpperCase() : '___________________';
-
-  const idEl = document.getElementById(`print-sign-${num}-id`);
-  if (idEl) idEl.textContent = idIn ? `C.C. ${idIn}` : 'C.C. ___________________';
-}
-
-// Ejecutar Impresión Física
-function executeDirectPrint() {
-  updatePrintPreview();
-  window.print();
-}
-
-// Ejecutar Descarga de PDF
-function executePDFExport() {
-  updatePrintPreview();
-  const element = document.getElementById('printable-report');
-  if (!element) return;
-
-  showToast('Generando documento PDF en alta resolución...', 'info');
-  element.style.display = 'block';
-
-  const opt = {
-    margin: [8, 8, 8, 8],
-    filename: `Inventario_Habitacion_${currentRoomId}_Quirama.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, logging: false },
-    jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
-  };
-
-  html2pdf().set(opt).from(element).save().then(() => {
-    element.style.display = 'none';
-    showToast('¡PDF descargado con éxito!', 'success');
-  }).catch(err => {
-    element.style.display = 'none';
-    console.error('Error al generar PDF:', err);
-    alert('Ocurrió un inconveniente al generar el PDF. Puedes pulsar "Imprimir Físico" y seleccionar "Guardar como PDF".');
-  });
-}
-
-// Ejecutar Descarga de Imagen PNG
-function executeImageExport() {
-  updatePrintPreview();
-  const element = document.getElementById('printable-report');
-  if (!element) return;
-
-  showToast('Generando imagen de alta resolución...', 'info');
-  element.style.display = 'block';
-
-  html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
-    element.style.display = 'none';
-    const link = document.createElement('a');
-    link.download = `Inventario_Habitacion_${currentRoomId}_Quirama.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    showToast('¡Imagen descargada con éxito!', 'success');
-  }).catch(err => {
-    element.style.display = 'none';
-    console.error('Error al generar imagen:', err);
-    alert('Error al generar la imagen.');
-  });
-}
-
-// ==============================================================
-// 10. MODAL DE AJUSTES GENERALES & LOGOTIPO
+// 12. MODAL DE AJUSTES GENERALES & LOGOTIPO
 // ==============================================================
 function openSettingsModal() {
   const modal = document.getElementById('modal-settings');
@@ -1055,7 +1168,7 @@ function resetDefaultLogo() {
 
 function exportBackupData() {
   const backupObject = {
-    version: '3.0',
+    version: '4.0',
     exportDate: new Date().toISOString(),
     hotel: appSettings.hotelName,
     settings: appSettings,
@@ -1102,7 +1215,7 @@ function importBackupData(event) {
 }
 
 // ==============================================================
-// 11. UTILIDADES Y NOTIFICACIONES
+// 13. UTILIDADES Y NOTIFICACIONES
 // ==============================================================
 function escapeHTML(str) {
   if (!str) return '';
@@ -1142,7 +1255,7 @@ function showToast(message, type = 'info') {
       <i data-lucide="${iconName}" class="w-5 h-5" style="color: ${borderColor}"></i>
       <span class="text-xs font-bold text-slate-800">${escapeHTML(message)}</span>
     </div>
-    <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600">
+    <button type="button" onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600">
       <i data-lucide="x" class="w-3.5 h-3.5"></i>
     </button>
   `;

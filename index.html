@@ -25,10 +25,6 @@
               700: '#00723A',
               800: '#005428', /* Verde Bosque Comfenalco */
               900: '#003E1D',
-            },
-            accent: {
-              gold: '#D69724',
-              goldHover: '#B97F19'
             }
           }
         }
@@ -72,14 +68,14 @@
 
           <!-- Botones rápidos en móvil -->
           <div class="flex md:hidden items-center gap-2">
-            <button onclick="openRoomMatrixModal()" class="px-2.5 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white text-xs font-bold flex items-center gap-1">
+            <button type="button" onclick="openRoomMatrixModal()" class="px-2.5 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white text-xs font-bold flex items-center gap-1">
               <i data-lucide="layout-grid" class="w-4 h-4 text-emerald-200"></i>
               <span>60 Hab</span>
             </button>
-            <button onclick="openPrintModal()" class="px-2.5 py-1.5 rounded-lg bg-emerald-800 text-white text-xs font-bold flex items-center gap-1">
+            <button type="button" onclick="directPrintRoom()" class="px-2.5 py-1.5 rounded-lg bg-emerald-800 text-white text-xs font-bold flex items-center gap-1">
               <i data-lucide="printer" class="w-4 h-4"></i>
             </button>
-            <button onclick="openSettingsModal()" class="p-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white">
+            <button type="button" onclick="openSettingsModal()" class="p-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white">
               <i data-lucide="settings" class="w-4 h-4"></i>
             </button>
           </div>
@@ -106,19 +102,25 @@
           </div>
 
           <!-- Botón Matriz 60 Habitaciones -->
-          <button onclick="openRoomMatrixModal()" class="px-3.5 py-2 bg-emerald-900/80 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 border border-emerald-500/30 transition">
+          <button type="button" onclick="openRoomMatrixModal()" class="px-3.5 py-2 bg-emerald-900/80 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 border border-emerald-500/30 transition">
             <i data-lucide="layout-grid" class="w-4 h-4 text-emerald-300"></i>
             <span>Matriz 60 Hab</span>
           </button>
 
-          <!-- Botón Imprimir & PDF con Personalización -->
-          <button onclick="openPrintModal()" class="px-4 py-2 bg-white text-brand-800 hover:bg-emerald-50 text-xs font-extrabold rounded-xl shadow-md flex items-center gap-2 transition active:scale-95">
+          <!-- Botón Imprimir Rápido -->
+          <button type="button" onclick="directPrintRoom()" class="px-4 py-2 bg-white text-brand-800 hover:bg-emerald-50 text-xs font-black rounded-xl shadow-md flex items-center gap-2 transition active:scale-95">
             <i data-lucide="printer" class="w-4 h-4 text-brand-600"></i>
-            <span>Imprimir / PDF / Firmas</span>
+            <span>Imprimir Hoja</span>
+          </button>
+
+          <!-- Botón Personalizar & Firmas -->
+          <button type="button" onclick="openPrintModal()" class="px-3.5 py-2 bg-emerald-900/60 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 border border-emerald-500/30 transition" title="Personalizar datos y firmas del reporte">
+            <i data-lucide="sliders" class="w-4 h-4 text-emerald-300"></i>
+            <span>Firmas & PDF</span>
           </button>
 
           <!-- Botón Ajustes Generales -->
-          <button onclick="openSettingsModal()" class="p-2 bg-white/15 hover:bg-white/25 text-white rounded-xl shadow-sm border border-white/20 transition" title="Ajustes de Hotel y Logo">
+          <button type="button" onclick="openSettingsModal()" class="p-2 bg-white/15 hover:bg-white/25 text-white rounded-xl shadow-sm border border-white/20 transition" title="Ajustes de Hotel y Logo">
             <i data-lucide="settings" class="w-4 h-4"></i>
           </button>
         </div>
@@ -137,7 +139,7 @@
         <!-- Selector y Navegador de Habitación -->
         <div class="flex flex-wrap items-center gap-3">
           <div class="flex items-center gap-1">
-            <button onclick="navigateRoom(-1)" class="p-2.5 rounded-xl border border-slate-200 hover:bg-brand-50 text-slate-700 active:scale-95 transition" title="Habitación anterior">
+            <button type="button" onclick="navigateRoom(-1)" class="p-2.5 rounded-xl border border-slate-200 hover:bg-brand-50 text-slate-700 active:scale-95 transition" title="Habitación anterior">
               <i data-lucide="chevron-left" class="w-5 h-5 text-brand-700"></i>
             </button>
             
@@ -150,13 +152,13 @@
               </div>
             </div>
 
-            <button onclick="navigateRoom(1)" class="p-2.5 rounded-xl border border-slate-200 hover:bg-brand-50 text-slate-700 active:scale-95 transition" title="Siguiente habitación">
+            <button type="button" onclick="navigateRoom(1)" class="p-2.5 rounded-xl border border-slate-200 hover:bg-brand-50 text-slate-700 active:scale-95 transition" title="Siguiente habitación">
               <i data-lucide="chevron-right" class="w-5 h-5 text-brand-700"></i>
             </button>
           </div>
 
           <!-- Botón Abrir Matriz de Habitaciones -->
-          <button onclick="openRoomMatrixModal()" class="px-3 py-2 rounded-xl text-xs font-bold bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 flex items-center gap-1.5 transition">
+          <button type="button" onclick="openRoomMatrixModal()" class="px-3 py-2 rounded-xl text-xs font-bold bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 flex items-center gap-1.5 transition">
             <i data-lucide="grid" class="w-4 h-4 text-brand-600"></i>
             <span>Ver Matriz 60</span>
           </button>
@@ -168,18 +170,30 @@
           </div>
         </div>
 
-        <!-- Botones de Acción Rápida (Guardar, Imprimir, PDF) -->
+        <!-- BOTONES DE ACCIÓN DIRECTOS Y CLAROS -->
         <div class="flex flex-wrap items-center gap-2">
           
-          <!-- Botón Personalizar & Imprimir / PDF -->
-          <button onclick="openPrintModal()" class="flex-1 sm:flex-none px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-extrabold rounded-xl shadow-sm flex items-center justify-center gap-2 active:scale-95 transition" title="Configurar parámetros, firmas y descargar o imprimir">
-            <i data-lucide="file-check" class="w-4 h-4"></i>
-            <span>Generar Documento / Imprimir</span>
+          <!-- Botón 1: IMPRIMIR FÍSICO DIRECTO -->
+          <button type="button" onclick="directPrintRoom()" class="flex-1 sm:flex-none px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-black rounded-xl shadow-sm flex items-center justify-center gap-2 active:scale-95 transition" title="Imprimir hoja de control de la habitación">
+            <i data-lucide="printer" class="w-4 h-4 text-emerald-400"></i>
+            <span>Imprimir</span>
           </button>
 
-          <!-- Botón Guardar Cambios -->
-          <button onclick="saveCurrentRoomManual()" class="flex-1 sm:flex-none px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-extrabold rounded-xl shadow-sm flex items-center justify-center gap-2 active:scale-95 transition">
-            <i data-lucide="save" class="w-4 h-4 text-emerald-400"></i>
+          <!-- Botón 2: DESCARGAR PDF DIRECTO -->
+          <button type="button" onclick="directExportPDF()" class="flex-1 sm:flex-none px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-black rounded-xl shadow-sm flex items-center justify-center gap-2 active:scale-95 transition" title="Descargar como archivo PDF">
+            <i data-lucide="file-down" class="w-4 h-4"></i>
+            <span>Descargar PDF</span>
+          </button>
+
+          <!-- Botón 3: PERSONALIZAR PARÁMETROS Y FIRMAS -->
+          <button type="button" onclick="openPrintModal()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-brand-50 hover:bg-brand-100 text-brand-900 border border-brand-300 text-xs font-extrabold rounded-xl shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition" title="Modificar encabezados, cédulas y firmas del documento">
+            <i data-lucide="pen-tool" class="w-4 h-4 text-brand-700"></i>
+            <span>Firmas & Formato</span>
+          </button>
+
+          <!-- Botón 4: GUARDAR HABITACIÓN -->
+          <button type="button" id="btn-save-room" onclick="saveCurrentRoomManual()" class="flex-1 sm:flex-none px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-black rounded-xl shadow-md flex items-center justify-center gap-2 active:scale-95 transition" title="Guardar todos los cambios y novedades de esta habitación">
+            <i data-lucide="save" class="w-4 h-4"></i>
             <span>Guardar Habitación</span>
           </button>
         </div>
@@ -190,7 +204,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-5 pt-5 border-t border-emerald-50">
         <div>
           <label class="block text-xs font-bold text-brand-900 uppercase tracking-wider mb-1">Tipo de Habitación</label>
-          <select id="room-type-input" onchange="updateRoomMetadata('type', this.value)" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+          <select id="room-type-input" onchange="syncCurrentRoomFromDOM(); saveRoomsToStorage();" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
             <option value="Estándar Colonial">Estándar Colonial</option>
             <option value="Doble Familiar">Doble Familiar</option>
             <option value="Suite Quirama">Suite Quirama</option>
@@ -201,19 +215,19 @@
 
         <div>
           <label class="block text-xs font-bold text-brand-900 uppercase tracking-wider mb-1">Camarera / Auxiliar</label>
-          <input type="text" id="room-housekeeper-input" oninput="updateRoomMetadata('housekeeper', this.value)" placeholder="Nombre de la camarera" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+          <input type="text" id="room-housekeeper-input" oninput="syncCurrentRoomFromDOM(); saveRoomsToStorage();" placeholder="Nombre de la camarera" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
         </div>
 
         <div>
           <label class="block text-xs font-bold text-brand-900 uppercase tracking-wider mb-1">Supervisora Ama de Llaves</label>
-          <input type="text" id="room-auditor-input" oninput="updateRoomMetadata('auditor', this.value)" placeholder="Nombre de supervisora" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+          <input type="text" id="room-auditor-input" oninput="syncCurrentRoomFromDOM(); saveRoomsToStorage();" placeholder="Nombre de supervisora" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
         </div>
 
         <div>
           <label class="block text-xs font-bold text-brand-900 uppercase tracking-wider mb-1">Fecha & Hora</label>
           <div class="flex items-center gap-1.5">
-            <input type="datetime-local" id="room-date-input" onchange="updateRoomMetadata('date', this.value)" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
-            <button onclick="setCurrentDateTime()" class="px-2.5 py-2.5 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-xl text-xs border border-brand-200" title="Colocar fecha y hora actual">
+            <input type="datetime-local" id="room-date-input" onchange="syncCurrentRoomFromDOM(); saveRoomsToStorage();" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <button type="button" onclick="setCurrentDateTime()" class="px-2.5 py-2.5 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-xl text-xs border border-brand-200" title="Colocar fecha y hora actual">
               <i data-lucide="clock" class="w-4 h-4"></i>
             </button>
           </div>
@@ -248,12 +262,12 @@
           <input type="text" id="item-search" oninput="filterItems(this.value)" placeholder="Buscar elemento..." class="w-full text-xs pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500">
         </div>
 
-        <button onclick="openAddItemModal()" class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 transition active:scale-95">
+        <button type="button" onclick="openAddItemModal()" class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 transition active:scale-95">
           <i data-lucide="plus" class="w-4 h-4"></i>
           <span>Agregar Elemento</span>
         </button>
 
-        <button onclick="resetCurrentRoomToStandard()" class="p-2 border border-slate-200 bg-white hover:bg-brand-50 text-slate-600 hover:text-brand-700 rounded-xl text-xs transition" title="Restablecer cantidades a estándar">
+        <button type="button" onclick="resetCurrentRoomToStandard()" class="p-2 border border-slate-200 bg-white hover:bg-brand-50 text-slate-600 hover:text-brand-700 rounded-xl text-xs transition" title="Restablecer cantidades a estándar">
           <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
         </button>
       </div>
@@ -285,7 +299,7 @@
       <div id="empty-state" class="hidden p-12 text-center">
         <i data-lucide="inbox" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
         <h3 class="text-sm font-bold text-slate-700">No hay elementos en esta habitación</h3>
-        <button onclick="resetCurrentRoomToStandard()" class="mt-4 px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow-sm hover:bg-brand-700">
+        <button type="button" onclick="resetCurrentRoomToStandard()" class="mt-4 px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow-sm hover:bg-brand-700">
           Cargar Dotación Estándar
         </button>
       </div>
@@ -300,7 +314,7 @@
         </h3>
         <span class="text-xs text-slate-400">Aparecerán en el documento oficial</span>
       </div>
-      <textarea id="room-general-notes" oninput="updateRoomMetadata('notes', this.value)" rows="3" placeholder="Escriba aquí notas generales (ej. Sombrilla con varilla suelta, toalla rodapié faltante, control TV probado y funcionando...)" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-800"></textarea>
+      <textarea id="room-general-notes" oninput="syncCurrentRoomFromDOM(); saveRoomsToStorage();" rows="3" placeholder="Escriba aquí notas generales (ej. Sombrilla con varilla suelta, toalla rodapié faltante, control TV probado y funcionando...)" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-800"></textarea>
     </section>
 
   </main>
@@ -335,7 +349,7 @@
             <p class="text-xs text-emerald-100">Personaliza los datos, títulos, tamaño de letra y las firmas finales antes de generar el reporte.</p>
           </div>
         </div>
-        <button onclick="closePrintModal()" class="p-1 rounded-lg text-emerald-200 hover:text-white transition">
+        <button type="button" onclick="closePrintModal()" class="p-1 rounded-lg text-emerald-200 hover:text-white transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -473,12 +487,12 @@
       <!-- Pie del Modal con los Botones de Acción -->
       <div class="px-6 py-4 bg-slate-100 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
         <button type="button" onclick="closePrintModal()" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-xl">
-          Cancelar
+          Cerrar
         </button>
 
         <div class="flex flex-wrap items-center gap-2">
           <!-- Botón Imprimir Físico -->
-          <button type="button" onclick="executeDirectPrint()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-extrabold rounded-xl shadow-sm flex items-center gap-2 active:scale-95 transition">
+          <button type="button" onclick="directPrintRoom()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-extrabold rounded-xl shadow-sm flex items-center gap-2 active:scale-95 transition">
             <i data-lucide="printer" class="w-4 h-4"></i>
             <span>Imprimir Físico</span>
           </button>
@@ -490,7 +504,7 @@
           </button>
 
           <!-- Botón Descargar PDF -->
-          <button type="button" onclick="executePDFExport()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-black rounded-xl shadow-md flex items-center gap-2 active:scale-95 transition">
+          <button type="button" onclick="directExportPDF()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-black rounded-xl shadow-md flex items-center gap-2 active:scale-95 transition">
             <i data-lucide="file-down" class="w-4 h-4"></i>
             <span>Descargar PDF</span>
           </button>
@@ -513,7 +527,7 @@
           <i data-lucide="layout-grid" class="w-5 h-5 text-emerald-300"></i>
           <h2 class="text-base font-extrabold">Matriz de Inspección · 60 Habitaciones</h2>
         </div>
-        <button onclick="closeRoomMatrixModal()" class="p-1 rounded-lg text-emerald-200 hover:text-white transition">
+        <button type="button" onclick="closeRoomMatrixModal()" class="p-1 rounded-lg text-emerald-200 hover:text-white transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -543,7 +557,7 @@
 
       <!-- Pie -->
       <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end">
-        <button onclick="closeRoomMatrixModal()" class="px-4 py-2 bg-brand-700 hover:bg-brand-800 text-white text-xs font-bold rounded-xl">
+        <button type="button" onclick="closeRoomMatrixModal()" class="px-4 py-2 bg-brand-700 hover:bg-brand-800 text-white text-xs font-bold rounded-xl">
           Cerrar
         </button>
       </div>
@@ -563,7 +577,7 @@
           <i data-lucide="plus-circle" class="w-5 h-5 text-emerald-200"></i>
           <h2 class="text-base font-extrabold">Agregar Nuevo Elemento</h2>
         </div>
-        <button onclick="closeAddItemModal()" class="p-1 rounded-lg text-emerald-200 hover:text-white transition">
+        <button type="button" onclick="closeAddItemModal()" class="p-1 rounded-lg text-emerald-200 hover:text-white transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -641,7 +655,7 @@
           <i data-lucide="sliders" class="w-5 h-5 text-emerald-300"></i>
           <h2 class="text-base font-extrabold">Ajustes Generales del Hotel & Logotipo</h2>
         </div>
-        <button onclick="closeSettingsModal()" class="p-1 rounded-lg text-emerald-200 hover:text-white transition">
+        <button type="button" onclick="closeSettingsModal()" class="p-1 rounded-lg text-emerald-200 hover:text-white transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -666,7 +680,7 @@
                 <span>Subir Logo desde tu Computador</span>
                 <input type="file" id="logo-file-input" accept="image/*" onchange="handleLogoUpload(event)" class="hidden">
               </label>
-              <button onclick="resetDefaultLogo()" class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition ml-2">
+              <button type="button" onclick="resetDefaultLogo()" class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition ml-2">
                 <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
                 <span>Logo Predeterminado</span>
               </button>
@@ -682,7 +696,7 @@
             <span>Copia de Seguridad de las 60 Habitaciones</span>
           </h3>
           <div class="flex flex-wrap gap-2 pt-1">
-            <button onclick="exportBackupData()" class="px-3.5 py-2 bg-brand-700 hover:bg-brand-800 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
+            <button type="button" onclick="exportBackupData()" class="px-3.5 py-2 bg-brand-700 hover:bg-brand-800 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
               <i data-lucide="download" class="w-4 h-4"></i>
               <span>Descargar Copia JSON</span>
             </button>
@@ -697,7 +711,7 @@
       </div>
 
       <div class="px-6 py-3 bg-slate-100 border-t border-slate-200 flex justify-end">
-        <button onclick="closeSettingsModal()" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-extrabold rounded-xl shadow-sm">
+        <button type="button" onclick="closeSettingsModal()" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-extrabold rounded-xl shadow-sm">
           Aceptar
         </button>
       </div>
