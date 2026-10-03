@@ -73,7 +73,7 @@ body {
   background: #008848;
 }
 
-/* Matriz de 60 Habitaciones */
+/* Matriz de Habitaciones */
 .room-grid-tile {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
@@ -187,74 +187,75 @@ body {
 }
 
 /* ==============================================================
-   ESTILOS OPTIMIZADOS PARA DOCUMENTO IMPRESO / PDF
-   (Texto más amplio, diseño limpio, sin sobrecarga de datos)
+   ESTILOS PARA DOCUMENTO IMPRESO / PDF
+   (Texto amplio, diseño limpio, CERO HOJAS EN BLANCO)
    ============================================================== */
 #printable-report {
   display: none;
   background-color: #FFFFFF;
   color: #111827;
   font-family: Arial, Helvetica, sans-serif;
-  line-height: 1.4;
-  padding: 16mm 14mm;
-  width: 210mm; /* A4 width */
+  line-height: 1.35;
+  width: 100%;
+  max-width: 800px;
   margin: 0 auto;
+  padding: 10px;
   box-sizing: border-box;
 }
 
 /* Opciones de tamaño de fuente del reporte */
 .report-font-large {
+  font-size: 11pt !important;
+}
+.report-font-large .report-table th {
+  font-size: 10pt !important;
+}
+.report-font-large .report-table td {
+  font-size: 10pt !important;
+}
+
+.report-font-xlarge {
   font-size: 12.5pt !important;
 }
-.report-font-xlarge {
-  font-size: 14pt !important;
+.report-font-xlarge .report-table th {
+  font-size: 11pt !important;
 }
-.report-font-normal {
+.report-font-xlarge .report-table td {
   font-size: 11pt !important;
 }
 
-@media print {
-  body * {
-    visibility: hidden;
-  }
-  #printable-report, #printable-report * {
-    visibility: visible;
-  }
-  #printable-report {
-    display: block !important;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    padding: 10mm 12mm;
-  }
-  @page {
-    size: letter portrait;
-    margin: 8mm;
-  }
+.report-font-normal {
+  font-size: 9.5pt !important;
+}
+.report-font-normal .report-table th {
+  font-size: 9pt !important;
+}
+.report-font-normal .report-table td {
+  font-size: 9pt !important;
 }
 
 /* Cabecera del Reporte */
 .report-header-box {
-  border-bottom: 3px solid #008848;
-  padding-bottom: 12px;
-  margin-bottom: 16px;
+  border-bottom: 2.5px solid #008848;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 /* Tabla Simplificada y Amplia */
 .report-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 14px;
+  margin-top: 10px;
 }
 
 .report-table th {
-  background-color: #008848;
-  color: #FFFFFF;
+  background-color: #008848 !important;
+  color: #FFFFFF !important;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
   text-align: left;
-  padding: 8px 12px;
-  font-size: 11.5pt;
+  padding: 6px 10px;
+  font-size: 10.5pt;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -263,58 +264,162 @@ body {
 
 .report-table td {
   border: 1px solid #CBD5E1;
-  padding: 8px 12px;
+  padding: 5px 8px;
   vertical-align: middle;
-  font-size: 11pt;
+  font-size: 10.5pt;
 }
 
 .report-table tr:nth-child(even) td {
-  background-color: #F8FAF9;
+  background-color: #F8FAF9 !important;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 /* Etiquetas de Estado en el Reporte Impreso */
 .report-badge-ok {
   display: inline-block;
-  background-color: #E8F8F0;
-  color: #005428;
+  background-color: #E8F8F0 !important;
+  color: #005428 !important;
   border: 1.5px solid #008848;
   font-weight: 800;
-  padding: 3px 8px;
+  padding: 2px 7px;
   border-radius: 4px;
-  font-size: 10pt;
+  font-size: 9.5pt;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 .report-badge-warn {
   display: inline-block;
-  background-color: #FEF3C7;
-  color: #92400E;
+  background-color: #FEF3C7 !important;
+  color: #92400E !important;
   border: 1.5px solid #F59E0B;
   font-weight: 800;
-  padding: 3px 8px;
+  padding: 2px 7px;
   border-radius: 4px;
-  font-size: 10pt;
+  font-size: 9.5pt;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
-/* Sección de Firmas Amplia y Personalizable */
+/* Sección de Firmas */
 .report-signature-box {
-  margin-top: 40px;
+  margin-top: 25px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 25px;
-  page-break-inside: avoid;
+  gap: 20px;
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
 }
 
 .signature-line {
-  border-top: 2px solid #334155;
-  padding-top: 8px;
+  border-top: 1.5px solid #334155;
+  padding-top: 6px;
   text-align: center;
-  font-size: 10pt;
+  font-size: 9.5pt;
   color: #1E293B;
 }
 
 .signature-role {
   font-weight: 800;
-  font-size: 10.5pt;
+  font-size: 10pt;
   color: #005428;
   margin-bottom: 2px;
+}
+
+/* ==============================================================
+   REGLAS DE ORO PARA IMPRESIÓN FÍSICA (@media print)
+   Elimina al 100% páginas en blanco y contenido fantasma
+   ============================================================== */
+@media print {
+  /* 1. Resetear html y body a altura automática exacta y neutralizar viewport / flex */
+  html, body {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  /* 2. OCULTAR COMPLETAMENTE todos los elementos del navegador (Display None para liberar espacio) */
+  body > *:not(#printable-report) {
+    display: none !important;
+  }
+
+  header,
+  main,
+  footer,
+  #modal-manage-rooms,
+  #modal-matrix,
+  #modal-print-config,
+  #modal-add-item,
+  #modal-settings,
+  #toast-container {
+    display: none !important;
+  }
+
+  /* 3. El contenedor imprimible es el ÚNICO elemento activo en el flujo */
+  #printable-report {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #FFFFFF !important;
+    box-sizing: border-box !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    page-break-before: avoid !important;
+    break-before: avoid !important;
+  }
+
+  /* 4. Configuración de página Carta con márgenes seguros */
+  @page {
+    size: letter portrait;
+    margin: 8mm 8mm 8mm 8mm;
+  }
+
+  /* 5. Prevenir saltos de página dentro de bloques esenciales */
+  .report-header-box,
+  .report-signature-box,
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Ajustes de espaciado compactos para asegurar que la dotación de 20 artículos quepa en 1 sola hoja */
+  .report-header-box {
+    margin-bottom: 6px !important;
+    padding-bottom: 5px !important;
+  }
+  .report-table {
+    margin-top: 6px !important;
+  }
+  .report-table th {
+    padding: 4px 6px !important;
+    font-size: 9.5pt !important;
+  }
+  .report-table td {
+    padding: 3.5px 6px !important;
+    font-size: 9.5pt !important;
+  }
+  .report-signature-box {
+    margin-top: 14px !important;
+    gap: 15px !important;
+  }
+  .signature-line {
+    padding-top: 4px !important;
+  }
+
+  /* Eliminar cualquier margen final que pueda empujar una página vacía */
+  #printable-report > *:last-child {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
 }

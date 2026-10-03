@@ -138,6 +138,12 @@ document.addEventListener('DOMContentLoaded', () => {
   updateGlobalStats();
   initLucide();
   setCurrentDateTime();
+  updatePrintPreview();
+});
+
+window.addEventListener('beforeprint', () => {
+  syncCurrentRoomFromDOM();
+  updatePrintPreview();
 });
 
 function initLucide() {
@@ -1206,10 +1212,10 @@ function updatePrintPreview() {
 
           tr.innerHTML = `
             <td style="text-align: center; font-weight: bold; color: #475569; width: 35px;">${idx + 1}</td>
-            <td style="font-weight: 800; color: #0F172A; font-size: 11.5pt;">${escapeHTML(item.name)}</td>
-            <td style="text-align: center; font-weight: 900; font-size: 12pt; color: ${isOk ? '#008848' : '#D97706'};">${item.actualQty}</td>
+            <td style="font-weight: 800; color: #0F172A;">${escapeHTML(item.name)}</td>
+            <td style="text-align: center; font-weight: 900; color: ${isOk ? '#008848' : '#D97706'};">${item.actualQty}</td>
             <td style="text-align: center;">${badgeHtml}</td>
-            <td style="font-size: 10.5pt; color: #1E293B; font-weight: ${isOk ? 'normal' : 'bold'};">${escapeHTML(obsText)}</td>
+            <td style="color: #1E293B; font-weight: ${isOk ? 'normal' : 'bold'};">${escapeHTML(obsText)}</td>
           `;
           tbody.appendChild(tr);
         });
