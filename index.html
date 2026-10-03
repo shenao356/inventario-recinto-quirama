@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Inventario de Habitaciones | Hotel Recinto Quirama - Comfenalco</title>
+  <meta name="description" content="Sistema de gestión y auditoría de inventario de habitaciones para el Hotel Recinto Quirama de Comfenalco Antioquia.">
+  <link rel="icon" type="image/svg+xml" href="logo-default.svg">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#F0F9F7',
+              100: '#E6F5F1',
+              200: '#C2E7DE',
+              500: '#008F7A',
+              600: '#007A65',
+              700: '#005B4E',
+              800: '#064E3B',
+              900: '#0A3C33',
+            },
+            gold: {
+              400: '#E2B159',
+              500: '#D99B26',
+              600: '#B88628',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- html2pdf.js & html2canvas for PDF and Image exports -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased flex flex-col min-h-screen">
+
+  <!-- HEADER INSTITUCIONAL -->
+  <header class="header-bar sticky top-0 z-30 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        
+        <!-- Logo y Título -->
+        <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+          <div class="flex items-center gap-3">
+            <div id="header-logo-container" class="h-12 w-auto bg-white/95 p-1 rounded-lg shadow-sm flex items-center justify-center max-w-[170px]">
+              <img id="hotel-header-logo" src="logo-default.svg" alt="Hotel Recinto Quirama" class="h-10 w-auto object-contain">
+            </div>
+            <div>
+              <h1 id="header-hotel-title" class="text-lg md:text-xl font-bold tracking-tight text-white leading-tight">
+                Hotel Recinto Quirama
+              </h1>
+              <p id="header-hotel-subtitle" class="text-xs text-brand-100 font-medium tracking-wide flex items-center gap-1.5">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+                Comfenalco Antioquia · Control de Inventario
+              </p>
+            </div>
+          </div>
+
+          <!-- Botón móvil para abrir menú -->
+          <div class="flex md:hidden items-center gap-2">
+            <button onclick="openRoomMatrixModal()" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1" title="Ver 60 Habitaciones">
+              <i data-lucide="layout-grid" class="w-4 h-4"></i>
+              <span>60 Hab</span>
+            </button>
+            <button onclick="openSettingsModal()" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white" title="Ajustes">
+              <i data-lucide="settings" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Acciones Principales y Estadísticas Globales -->
+        <div class="hidden md:flex items-center gap-3">
+          <!-- Estadísticas Rápidas -->
+          <div class="brand-badge px-3 py-1.5 rounded-lg flex items-center gap-3 text-xs text-white">
+            <div title="Total de habitaciones configuradas">
+              <span class="text-brand-100">Total:</span>
+              <strong id="stat-total-rooms" class="font-bold ml-1 text-white">60</strong>
+            </div>
+            <span class="text-white/30">|</span>
+            <div title="Habitaciones conformes">
+              <span class="text-emerald-300 font-medium">Conformes:</span>
+              <strong id="stat-ok-rooms" class="font-bold ml-1 text-emerald-200">0</strong>
+            </div>
+            <span class="text-white/30">|</span>
+            <div title="Habitaciones con novedad">
+              <span class="text-amber-300 font-medium">Novedades:</span>
+              <strong id="stat-warn-rooms" class="font-bold ml-1 text-amber-200">0</strong>
+            </div>
+          </div>
+
+          <!-- Botón Matriz Habitaciones -->
+          <button onclick="openRoomMatrixModal()" class="px-3.5 py-2 bg-emerald-800/80 hover:bg-emerald-700/90 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5 border border-emerald-600/40 transition">
+            <i data-lucide="layout-grid" class="w-4 h-4 text-emerald-300"></i>
+            <span>Matriz 60 Habitaciones</span>
+          </button>
+
+          <!-- Botón Ajustes -->
+          <button onclick="openSettingsModal()" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5 border border-white/20 transition">
+            <i data-lucide="settings" class="w-4 h-4 text-amber-300"></i>
+            <span>Ajustes & Logo</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+    <!-- BARRA SUPERIOR DE HABITACIÓN ACTIVA -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 transition">
+      <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-5">
+        
+        <!-- Selector y Navegador de Habitación -->
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="flex items-center gap-1">
+            <button onclick="navigateRoom(-1)" class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 active:scale-95 transition" title="Habitación anterior">
+              <i data-lucide="chevron-left" class="w-5 h-5"></i>
+            </button>
+            
+            <div class="relative inline-block">
+              <select id="room-select" onchange="changeActiveRoom(this.value)" class="appearance-none bg-brand-50 border-2 border-brand-500 text-brand-900 font-extrabold text-lg sm:text-xl rounded-xl py-2 pl-4 pr-10 hover:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer shadow-sm transition">
+                <!-- Se llena dinámicamente con las 60 habitaciones -->
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-brand-700">
+                <i data-lucide="chevrons-up-down" class="w-4 h-4"></i>
+              </div>
+            </div>
+
+            <button onclick="navigateRoom(1)" class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 active:scale-95 transition" title="Siguiente habitación">
+              <i data-lucide="chevron-right" class="w-5 h-5"></i>
+            </button>
+          </div>
+
+          <!-- Botón Abrir Matriz de Habitaciones (Mobile & Desktop) -->
+          <button onclick="openRoomMatrixModal()" class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center gap-1.5 transition">
+            <i data-lucide="grid" class="w-4 h-4 text-brand-600"></i>
+            <span>Ver Mapa 60 Hab</span>
+          </button>
+
+          <!-- Estado general de la habitación -->
+          <div id="room-status-badge" class="px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-sm badge-pending">
+            <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+            <span id="room-status-text">Sin Inspección</span>
+          </div>
+        </div>
+
+        <!-- Botones de Acción de Exportación y Guardado -->
+        <div class="flex flex-wrap items-center gap-2">
+          
+          <!-- Botón Descargar PDF -->
+          <button onclick="exportToPDF()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 active:scale-95 transition" title="Generar archivo PDF para imprimir o enviar">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span>Descargar PDF</span>
+          </button>
+
+          <!-- Botón Descargar Imagen -->
+          <button onclick="exportToImage()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 active:scale-95 transition" title="Descargar como imagen PNG para WhatsApp">
+            <i data-lucide="image" class="w-4 h-4"></i>
+            <span>Descargar Imagen</span>
+          </button>
+
+          <!-- Botón Imprimir Físico -->
+          <button onclick="printInventoryReport()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 active:scale-95 transition" title="Imprimir directamente en impresora física">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>Imprimir</span>
+          </button>
+
+          <!-- Botón Guardar Cambios -->
+          <button onclick="saveCurrentRoomManual()" class="flex-1 sm:flex-none px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center justify-center gap-2 active:scale-95 transition">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span>Guardar</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- METADATOS DE INSPECCIÓN (Camarera, Tipo, Fecha, Auditor) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-5 pt-5 border-t border-slate-100">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Tipo de Habitación</label>
+          <select id="room-type-input" onchange="updateRoomMetadata('type', this.value)" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-lg p-2 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <option value="Estándar Colonial">Estándar Colonial</option>
+            <option value="Doble Familiar">Doble Familiar</option>
+            <option value="Suite Quirama">Suite Quirama</option>
+            <option value="Cabaña de Lujo">Cabaña de Lujo</option>
+            <option value="Múltiple">Múltiple</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Camarera / Auxiliar</label>
+          <input type="text" id="room-housekeeper-input" oninput="updateRoomMetadata('housekeeper', this.value)" placeholder="Nombre de la camarera" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-lg p-2 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Supervisor / Auditor</label>
+          <input type="text" id="room-auditor-input" oninput="updateRoomMetadata('auditor', this.value)" placeholder="Ama de Llaves / Revisor" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-lg p-2 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Fecha & Hora de Revisión</label>
+          <div class="flex items-center gap-1.5">
+            <input type="datetime-local" id="room-date-input" onchange="updateRoomMetadata('date', this.value)" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <button onclick="setCurrentDateTime()" class="px-2 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs" title="Colocar fecha y hora actual">
+              <i data-lucide="clock" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BARRA DE HERRAMIENTAS DE INVENTARIO (Filtros, Resumen de Cantidades, Añadir Ítem) -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+      
+      <!-- Resumen de Contadores de la Habitación -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-semibold text-slate-500">Resumen en Habitación:</span>
+        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-slate-100 text-slate-700">
+          Total Artículos: <span id="room-items-count" class="ml-1 text-slate-900">0</span>
+        </span>
+        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          Esperados: <span id="room-expected-total" class="ml-1 text-emerald-800 font-extrabold">0</span>
+        </span>
+        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
+          Contados: <span id="room-actual-total" class="ml-1 text-blue-800 font-extrabold">0</span>
+        </span>
+        <span id="badge-discrepancy" class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 hidden">
+          Diferencia: <span id="room-diff-count" class="ml-1 font-extrabold">0</span>
+        </span>
+      </div>
+
+      <!-- Buscador y Botón Agregar Elemento -->
+      <div class="flex items-center gap-2">
+        <div class="relative flex-1 sm:w-64">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
+          <input type="text" id="item-search" oninput="filterItems(this.value)" placeholder="Buscar elemento..." class="w-full text-xs pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <button onclick="openAddItemModal()" class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 transition active:scale-95">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>Agregar Elemento</span>
+        </button>
+
+        <button onclick="resetCurrentRoomToStandard()" class="p-2 border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 rounded-xl text-xs transition" title="Restablecer cantidades a estándar de catálogo">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- TABLA DE ARTÍCULOS DE INVENTARIO -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-600 uppercase text-[11px] font-bold tracking-wider">
+              <th class="py-3 px-4 w-12 text-center">#</th>
+              <th class="py-3 px-4 min-w-[200px]">Elemento / Artículo</th>
+              <th class="py-3 px-3 w-28 text-center">Cant. Estándar</th>
+              <th class="py-3 px-4 min-w-[170px] text-center">Cant. Real (Conteo)</th>
+              <th class="py-3 px-3 w-40 text-center">Estado Físico</th>
+              <th class="py-3 px-4 min-w-[200px]">Novedad / Observación</th>
+              <th class="py-3 px-3 w-16 text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="inventory-tbody" class="divide-y divide-slate-100 text-sm">
+            <!-- Rellenado dinámicamente -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Estado vacío cuando no hay elementos -->
+      <div id="empty-state" class="hidden p-12 text-center">
+        <i data-lucide="inbox" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
+        <h3 class="text-sm font-bold text-slate-700">No hay elementos en esta habitación</h3>
+        <p class="text-xs text-slate-500 mt-1">Haga clic en "Agregar Elemento" o cargue la dotación estándar.</p>
+        <button onclick="resetCurrentRoomToStandard()" class="mt-4 px-4 py-2 bg-brand-600 text-white rounded-lg text-xs font-semibold shadow-sm hover:bg-brand-700">
+          Cargar Dotación Estándar
+        </button>
+      </div>
+    </section>
+
+    <!-- OBSERVACIONES GENERALES DE LA HABITACIÓN -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+          <i data-lucide="clipboard-edit" class="w-4 h-4 text-brand-600"></i>
+          <span>Observaciones Generales de la Habitación</span>
+        </h3>
+        <span class="text-xs text-slate-400">Estas notas aparecerán en el reporte final para impresión</span>
+      </div>
+      <textarea id="room-general-notes" oninput="updateRoomMetadata('notes', this.value)" rows="3" placeholder="Escriba aquí notas adicionales (ej. Sombrilla con tela rota, control TV con compartimiento suelto, toalla deshilachada, cliente solicita toalla extra...)" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-800"></textarea>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 mt-auto py-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+      <div>
+        <strong class="font-semibold text-slate-700">Hotel Recinto Quirama</strong> · Comfenalco Antioquia (El Carmen de Viboral / Rionegro)
+      </div>
+      <div class="flex items-center gap-3">
+        <span>Gestión de Dotación & Ama de Llaves</span>
+        <span class="text-slate-300">·</span>
+        <span class="text-brand-600 font-medium">Versión 2.0 Web</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==============================================================
+       MODAL 1: MATRIZ DE 60 HABITACIONES
+       ============================================================== -->
+  <div id="modal-matrix" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="modal-backdrop fixed inset-0" onclick="closeRoomMatrixModal()"></div>
+    <div class="modal-content relative bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] z-10 border border-slate-200">
+      
+      <!-- Cabecera del Modal -->
+      <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="layout-grid" class="w-5 h-5 text-emerald-400"></i>
+          <h2 class="text-base font-bold">Matriz de Inspección · 60 Habitaciones</h2>
+        </div>
+        <button onclick="closeRoomMatrixModal()" class="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Leyenda de colores -->
+      <div class="px-6 py-3 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex flex-wrap items-center gap-4">
+          <span class="flex items-center gap-1.5 font-medium text-slate-600">
+            <span class="w-3 h-3 rounded bg-emerald-500"></span> Conforme (Todo OK)
+          </span>
+          <span class="flex items-center gap-1.5 font-medium text-slate-600">
+            <span class="w-3 h-3 rounded bg-amber-500"></span> Con Faltante / Novedad
+          </span>
+          <span class="flex items-center gap-1.5 font-medium text-slate-600">
+            <span class="w-3 h-3 rounded bg-slate-300"></span> Sin Inspección
+          </span>
+        </div>
+        <span class="text-slate-500 font-medium">Haga clic en cualquier casilla para abrirla</span>
+      </div>
+
+      <!-- Cuadrícula de 60 Habitaciones -->
+      <div class="p-6 overflow-y-auto">
+        <div id="room-matrix-container" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-10 gap-2.5">
+          <!-- Generado dinámicamente de 1 a 60 -->
+        </div>
+      </div>
+
+      <!-- Pie del Modal -->
+      <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeRoomMatrixModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg">
+          Cerrar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==============================================================
+       MODAL 2: AGREGAR NUEVO ELEMENTO
+       ============================================================== -->
+  <div id="modal-add-item" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="modal-backdrop fixed inset-0" onclick="closeAddItemModal()"></div>
+    <div class="modal-content relative bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden z-10 border border-slate-200">
+      
+      <div class="px-6 py-4 bg-brand-700 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="plus-circle" class="w-5 h-5 text-emerald-200"></i>
+          <h2 class="text-base font-bold">Agregar Nuevo Elemento</h2>
+        </div>
+        <button onclick="closeAddItemModal()" class="p-1 rounded-lg text-brand-200 hover:text-white transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-add-item" onsubmit="handleAddItemSubmit(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Nombre del Artículo / Elemento *</label>
+          <input type="text" id="add-item-name" required placeholder="Ej. Plancha a vapor, Cuna, Lámpara..." class="w-full text-sm bg-slate-50 border border-slate-200 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Categoría</label>
+          <select id="add-item-category" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium">
+            <option value="Accesorios de Habitación">Accesorios de Habitación (Sombrilla, Cesta...)</option>
+            <option value="Tecnología">Tecnología (Controles, TV...)</option>
+            <option value="Lencería y Baño">Lencería y Baño (Toallas, Rodapié...)</option>
+            <option value="Ropa de Cama">Ropa de Cama (Cobijas, Almohadas...)</option>
+            <option value="Electrodomésticos">Electrodomésticos (Secador, etc.)</option>
+            <option value="Menaje">Menaje (Vasos, Tazas...)</option>
+            <option value="Mobiliario">Mobiliario & Clóset</option>
+            <option value="Otros">Otros</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Cant. Estándar *</label>
+            <input type="number" id="add-item-standard" min="0" value="1" required class="w-full text-sm bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-center font-bold focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Cant. Real *</label>
+            <input type="number" id="add-item-actual" min="0" value="1" required class="w-full text-sm bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-center font-bold focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Estado Físico Inicial</label>
+          <select id="add-item-status" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium">
+            <option value="Completo / Buen estado">Completo / Buen estado</option>
+            <option value="Faltante">Faltante</option>
+            <option value="Dañado">Dañado</option>
+            <option value="Manchado / Sucio">Manchado / Sucio</option>
+          </select>
+        </div>
+
+        <div class="pt-2">
+          <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+            <input type="checkbox" id="add-item-to-all" class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-slate-300">
+            <span>Agregar este elemento a las 60 habitaciones por defecto</span>
+          </label>
+        </div>
+
+        <div class="pt-4 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeAddItemModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">
+            Cancelar
+          </button>
+          <button type="submit" class="px-4 py-2 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm">
+            Guardar Elemento
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ==============================================================
+       MODAL 3: AJUSTES (LOGO, HOTEL, RESPALDO, CATÁLOGO)
+       ============================================================== -->
+  <div id="modal-settings" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="modal-backdrop fixed inset-0" onclick="closeSettingsModal()"></div>
+    <div class="modal-content relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden z-10 border border-slate-200 flex flex-col max-h-[92vh]">
+      
+      <!-- Encabezado Modal Ajustes -->
+      <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="sliders" class="w-5 h-5 text-amber-400"></i>
+          <h2 class="text-base font-bold">Ajustes y Configuración del Hotel</h2>
+        </div>
+        <button onclick="closeSettingsModal()" class="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Contenido de Ajustes con Tabs / Secciones -->
+      <div class="p-6 overflow-y-auto space-y-6 text-sm">
+        
+        <!-- SECCIÓN 1: LOGOTIPO DE LA EMPRESA -->
+        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2 mb-3">
+            <i data-lucide="image" class="w-4 h-4 text-brand-600"></i>
+            <span>Logotipo de la Empresa / Hotel</span>
+          </h3>
+
+          <div class="flex flex-col sm:flex-row items-center gap-4">
+            <!-- Vista Previa del Logo -->
+            <div class="w-36 h-20 bg-white border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center p-2 shadow-inner overflow-hidden">
+              <img id="settings-logo-preview" src="logo-default.svg" alt="Vista previa logo" class="max-h-full max-w-full object-contain">
+            </div>
+
+            <!-- Controles de Carga -->
+            <div class="flex-1 space-y-2 text-center sm:text-left">
+              <label class="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-lg shadow-sm transition">
+                <i data-lucide="upload" class="w-4 h-4"></i>
+                <span>Subir Logo desde tu Computador</span>
+                <input type="file" id="logo-file-input" accept="image/*" onchange="handleLogoUpload(event)" class="hidden">
+              </label>
+              <button onclick="resetDefaultLogo()" class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg transition ml-2">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                <span>Restaurar Logo Inicial</span>
+              </button>
+              <p class="text-[11px] text-slate-500">Se recomienda formato PNG, JPG o SVG. Se guardará localmente y se mostrará en pantalla y en los reportes PDF/impresos.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 2: INFORMACIÓN INSTITUCIONAL -->
+        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+          <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+            <i data-lucide="building" class="w-4 h-4 text-brand-600"></i>
+            <span>Datos Institucionales del Hotel</span>
+          </h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre del Hotel / Sede</label>
+              <input type="text" id="settings-hotel-name" value="Hotel Recinto Quirama" class="w-full text-xs bg-white border border-slate-200 rounded-lg p-2 font-medium focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Entidad Administradora</label>
+              <input type="text" id="settings-hotel-entity" value="Comfenalco Antioquia" class="w-full text-xs bg-white border border-slate-200 rounded-lg p-2 font-medium focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Departamento / Área</label>
+              <input type="text" id="settings-hotel-dept" value="Departamento de Ama de Llaves y Habitaciones" class="w-full text-xs bg-white border border-slate-200 rounded-lg p-2 font-medium focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Ubicación / Ciudad</label>
+              <input type="text" id="settings-hotel-location" value="El Carmen de Viboral - Rionegro, Antioquia" class="w-full text-xs bg-white border border-slate-200 rounded-lg p-2 font-medium focus:ring-2 focus:ring-brand-500">
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 3: CONFIGURACIÓN DE HABITACIONES -->
+        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+          <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+            <i data-lucide="door-closed" class="w-4 h-4 text-brand-600"></i>
+            <span>Nomenclatura de Habitaciones</span>
+          </h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Cantidad de Habitaciones</label>
+              <input type="number" id="settings-room-count" min="1" max="200" value="60" class="w-full text-xs bg-white border border-slate-200 rounded-lg p-2 font-medium">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Estilo de Numeración</label>
+              <select id="settings-room-numbering" class="w-full text-xs bg-white border border-slate-200 rounded-lg p-2 font-medium">
+                <option value="1-60">Del 1 al 60 (Habitación 1 ... 60)</option>
+                <option value="101-160">Del 101 al 160 (Habitación 101 ... 160)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 4: COPIA DE SEGURIDAD (EXPORTAR/IMPORTAR) -->
+        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+          <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+            <i data-lucide="database" class="w-4 h-4 text-brand-600"></i>
+            <span>Copia de Respaldo de los Datos</span>
+          </h3>
+          <p class="text-xs text-slate-500">Puedes guardar una copia de seguridad en tu equipo para no perder el inventario o pasarla a otro computador.</p>
+          <div class="flex flex-wrap gap-2 pt-1">
+            <button onclick="exportBackupData()" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 transition">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>Descargar Copia (JSON)</span>
+            </button>
+            <label class="cursor-pointer px-3.5 py-2 bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 transition">
+              <i data-lucide="folder-up" class="w-4 h-4"></i>
+              <span>Restaurar Copia</span>
+              <input type="file" id="backup-file-input" accept=".json" onchange="importBackupData(event)" class="hidden">
+            </label>
+            <button onclick="resetAllFactoryData()" class="px-3.5 py-2 bg-red-100 hover:bg-red-200 text-red-700 text-xs font-bold rounded-lg flex items-center gap-1.5 transition ml-auto">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+              <span>Reiniciar a Fábrica</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Pie Modal Ajustes -->
+      <div class="px-6 py-3 bg-slate-100 border-t border-slate-200 flex items-center justify-between">
+        <span class="text-[11px] text-slate-500">Los cambios se guardan automáticamente en tu navegador</span>
+        <button onclick="saveSettingsModal()" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-lg shadow-sm">
+          Guardar Ajustes
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==============================================================
+       FORMATO DE REPORTE OFICIAL (PARA IMPRESIÓN Y PDF)
+       ============================================================== -->
+  <div id="printable-report">
+    
+    <!-- Membrete con Logo e Información Institucional -->
+    <div class="report-header-box flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img id="print-logo" src="logo-default.svg" alt="Logo Hotel" style="max-height: 55px; max-width: 160px; object-contain: fit;">
+        <div>
+          <h2 id="print-hotel-name" style="font-size: 15pt; font-weight: 800; color: #064E3B; margin: 0; line-height: 1.2;">HOTEL RECINTO QUIRAMA</h2>
+          <p id="print-hotel-entity" style="font-size: 9.5pt; font-weight: 700; color: #007A65; margin: 2px 0 0 0;">COMFENALCO ANTIOQUIA</p>
+          <p id="print-hotel-dept" style="font-size: 8pt; color: #4B5563; margin: 1px 0 0 0;">DEPARTAMENTO DE AMA DE LLAVES & HABITACIONES</p>
+        </div>
+      </div>
+      <div style="text-align: right;">
+        <span style="display: inline-block; background: #007A65; color: #fff; padding: 4px 10px; font-size: 8.5pt; font-weight: bold; border-radius: 4px; letter-spacing: 0.5px;">FORMATO OFICIAL DE DOTACIÓN</span>
+        <p style="font-size: 8.5pt; color: #4B5563; margin-top: 4px;">Código: F-REC-INV-01</p>
+      </div>
+    </div>
+
+    <!-- Título Principal del Reporte -->
+    <div style="text-align: center; margin-bottom: 14px;">
+      <h3 style="font-size: 13pt; font-weight: 800; text-transform: uppercase; color: #111827; letter-spacing: 0.5px; margin: 0;">
+        HOJA DE CONTROL E INVENTARIO DE HABITACIÓN
+      </h3>
+    </div>
+
+    <!-- Bloque de Metadatos de la Habitación -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background-color: #F3F4F6; border: 1px solid #D1D5DB; border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 9pt;">
+      <div>
+        <span style="font-weight: 700; color: #4B5563; display: block; font-size: 8pt;">HABITACIÓN:</span>
+        <strong id="print-room-number" style="font-size: 12pt; color: #064E3B;">101</strong>
+      </div>
+      <div>
+        <span style="font-weight: 700; color: #4B5563; display: block; font-size: 8pt;">TIPO:</span>
+        <span id="print-room-type" style="font-weight: 600; color: #111827;">Estándar</span>
+      </div>
+      <div>
+        <span style="font-weight: 700; color: #4B5563; display: block; font-size: 8pt;">FECHA Y HORA:</span>
+        <span id="print-room-date" style="font-weight: 600; color: #111827;">2026-10-03</span>
+      </div>
+      <div>
+        <span style="font-weight: 700; color: #4B5563; display: block; font-size: 8pt;">ESTADO AUDITORÍA:</span>
+        <span id="print-room-status" style="font-weight: 700; color: #065F46;">Conforme</span>
+      </div>
+      <div style="grid-column: span 2;">
+        <span style="font-weight: 700; color: #4B5563; display: block; font-size: 8pt;">CAMARERA / AUXILIAR:</span>
+        <span id="print-room-housekeeper" style="font-weight: 600; color: #111827;">-</span>
+      </div>
+      <div style="grid-column: span 2;">
+        <span style="font-weight: 700; color: #4B5563; display: block; font-size: 8pt;">SUPERVISORA / AMA DE LLAVES:</span>
+        <span id="print-room-auditor" style="font-weight: 600; color: #111827;">-</span>
+      </div>
+    </div>
+
+    <!-- Tabla de Ítems del Inventario -->
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th style="width: 25px; text-align: center;">N°</th>
+          <th style="min-width: 170px;">Artículo / Elemento</th>
+          <th style="width: 110px;">Categoría</th>
+          <th style="width: 65px; text-align: center;">Cant. Est.</th>
+          <th style="width: 65px; text-align: center;">Cant. Real</th>
+          <th style="width: 90px; text-align: center;">Estado</th>
+          <th>Observación / Novedad</th>
+        </tr>
+      </thead>
+      <tbody id="print-table-tbody">
+        <!-- Rellenado dinámicamente -->
+      </tbody>
+    </table>
+
+    <!-- Cuadro de Observaciones -->
+    <div style="margin-top: 14px; border: 1px solid #D1D5DB; border-radius: 6px; padding: 8px 12px; font-size: 9pt;">
+      <strong style="color: #374151; font-size: 8.5pt; text-transform: uppercase;">Observaciones Generales de la Inspección:</strong>
+      <p id="print-room-notes" style="margin: 4px 0 0 0; color: #1F2937; min-height: 30px; font-style: italic;">
+        Sin novedades reportadas.
+      </p>
+    </div>
+
+    <!-- Bloque de Firmas -->
+    <div class="report-signature-box">
+      <div class="signature-line">
+        <div class="signature-role">Firma Camarera / Auxiliar</div>
+        <div>C.C. ___________________</div>
+      </div>
+      <div class="signature-line">
+        <div class="signature-role">Firma Supervisora Ama de Llaves</div>
+        <div>C.C. ___________________</div>
+      </div>
+      <div class="signature-line">
+        <div class="signature-role">Firma Recepción / Auditoría</div>
+        <div>C.C. ___________________</div>
+      </div>
+    </div>
+
+    <!-- Pie de página del Reporte -->
+    <div style="margin-top: 18px; text-align: center; font-size: 7.5pt; color: #6B7280; border-top: 1px solid #E5E7EB; padding-top: 6px;">
+      Hotel Recinto Quirama · Comfenalco Antioquia · Kilómetro 5 Vía Rionegro - El Carmen de Viboral · Documento interno de control operativo.
+    </div>
+
+  </div>
+
+  <!-- Contenedor para Notificaciones Flotantes (Toast) -->
+  <div id="toast-container"></div>
+
+  <!-- Script Principal de la Aplicación -->
+  <script src="app.js"></script>
+</body>
+</html>

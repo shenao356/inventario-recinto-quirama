@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="100%" height="100%">
+  <defs>
+    <linearGradient id="comfenalcoGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#008F7A" />
+      <stop offset="100%" stop-color="#005B4E" />
+    </linearGradient>
+    <linearGradient id="accentGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E2B159" />
+      <stop offset="100%" stop-color="#B88628" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background container subtle rounded box -->
+  <rect x="2" y="2" width="496" height="116" rx="16" fill="#F4FAF8" stroke="#D1EBE5" stroke-width="1.5"/>
+
+  <!-- Quirama Colonial Arch & Nature Embellishment -->
+  <g transform="translate(18, 15)">
+    <!-- Shield / Emblem back -->
+    <rect x="0" y="0" width="90" height="90" rx="14" fill="url(#comfenalcoGreen)"/>
+    
+    <!-- Colonial Roof / Cabaña outline -->
+    <path d="M 45 16 L 76 38 L 76 44 L 69 44 L 69 74 L 21 74 L 21 44 L 14 44 Z" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Traditional Arch Window / Door -->
+    <path d="M 36 74 L 36 50 C 36 45 54 45 54 50 L 54 74 Z" fill="#E2B159"/>
+    
+    <!-- Quirama Tree / Nature Accent -->
+    <circle cx="45" cy="36" r="5" fill="#FFFFFF"/>
+    
+    <!-- Decorative Stars/Accents -->
+    <circle cx="28" cy="30" r="2" fill="#E2B159"/>
+    <circle cx="62" cy="30" r="2" fill="#E2B159"/>
+  </g>
+
+  <!-- Typography -->
+  <!-- Main Title -->
+  <text x="124" y="46" font-family="'Segoe UI', Roboto, 'Helvetica Neue', sans-serif" font-size="24" font-weight="800" fill="#0A3C33" letter-spacing="1">
+    HOTEL RECINTO QUIRAMA
+  </text>
+  
+  <!-- Subtitle with Comfenalco Brand Identity -->
+  <text x="124" y="72" font-family="'Segoe UI', Roboto, 'Helvetica Neue', sans-serif" font-size="14" font-weight="600" fill="#008F7A" letter-spacing="1.5">
+    COMFENALCO ANTIOQUIA
+  </text>
+  
+  <!-- Department Badge -->
+  <rect x="124" y="82" width="220" height="20" rx="4" fill="#008F7A" fill-opacity="0.12"/>
+  <text x="132" y="96" font-family="'Segoe UI', Roboto, 'Helvetica Neue', sans-serif" font-size="10.5" font-weight="700" fill="#006D5C" letter-spacing="0.8">
+    CONTROL DE INVENTARIO Y DOTACIÓN
+  </text>
+
+  <!-- Right Decorative Leaf/Knot -->
+  <path d="M 465 30 C 475 45 470 70 450 85 C 445 65 455 45 465 30 Z" fill="#008F7A" fill-opacity="0.25"/>
+  <path d="M 475 42 C 482 52 478 68 466 78 C 462 64 468 50 475 42 Z" fill="#E2B159" fill-opacity="0.6"/>
+</svg>

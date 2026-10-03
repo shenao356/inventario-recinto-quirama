@@ -1,0 +1,273 @@
+/* Hotel Recinto Quirama - Comfenalco Antioquia */
+/* Sistema de Control de Inventario de Habitaciones */
+
+:root {
+  --primary: #007A65;
+  --primary-hover: #006352;
+  --primary-dark: #0A3C33;
+  --primary-light: #E6F5F1;
+  --primary-subtle: #F0F9F7;
+  --accent-gold: #D99B26;
+  --accent-gold-light: #FEF6E9;
+  --status-ok: #10B981;
+  --status-ok-bg: #ECFDF5;
+  --status-warn: #F59E0B;
+  --status-warn-bg: #FFFBEB;
+  --status-danger: #EF4444;
+  --status-danger-bg: #FEF2F2;
+  --status-pending: #64748B;
+  --status-pending-bg: #F1F5F9;
+  --text-main: #0F172A;
+  --text-muted: #64748B;
+  --border-color: #E2E8F0;
+  --card-bg: #FFFFFF;
+  --body-bg: #F8FAFC;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--body-bg);
+  color: var(--text-main);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* Header Styles */
+.header-bar {
+  background: linear-gradient(135deg, #064E3B 0%, #007A65 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 15px rgba(0, 78, 59, 0.15);
+}
+
+.brand-badge {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Room Matrix Grid */
+.room-grid-tile {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  user-select: none;
+}
+.room-grid-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.12);
+}
+.room-grid-tile.active-room {
+  outline: 3px solid var(--accent-gold);
+  box-shadow: 0 0 0 4px rgba(217, 155, 38, 0.3);
+}
+
+/* Status Badges */
+.badge-ok {
+  background-color: var(--status-ok-bg);
+  color: #065F46;
+  border: 1px solid #A7F3D0;
+}
+.badge-warn {
+  background-color: var(--status-warn-bg);
+  color: #92400E;
+  border: 1px solid #FDE68A;
+}
+.badge-danger {
+  background-color: var(--status-danger-bg);
+  color: #991B1B;
+  border: 1px solid #FECACA;
+}
+.badge-pending {
+  background-color: var(--status-pending-bg);
+  color: #334155;
+  border: 1px solid #CBD5E1;
+}
+
+/* Quantity Control Buttons */
+.qty-btn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.qty-btn:active {
+  transform: scale(0.92);
+}
+
+/* Modal Transitions */
+.modal-backdrop {
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  transition: opacity 0.25s ease-out;
+}
+
+.modal-content {
+  animation: modalEnter 0.25s ease-out forwards;
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Toast Notification */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  min-width: 280px;
+  max-width: 420px;
+  background: #FFFFFF;
+  border-left: 5px solid var(--primary);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  animation: slideInToast 0.3s ease forwards;
+}
+@keyframes slideInToast {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ==============================================================
+   ESTILOS EXCLUSIVOS PARA IMPRESIÓN Y GENERACIÓN DE PDF
+   ============================================================== */
+#printable-report {
+  display: none;
+  background-color: #FFFFFF;
+  color: #111827;
+  font-size: 11pt;
+  line-height: 1.4;
+  padding: 20mm 15mm;
+  width: 210mm; /* A4 width */
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-report, #printable-report * {
+    visibility: visible;
+  }
+  #printable-report {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 12mm 15mm;
+  }
+  @page {
+    size: letter portrait;
+    margin: 10mm;
+  }
+}
+
+.report-header-box {
+  border-bottom: 2px solid #007A65;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 14px;
+  font-size: 10pt;
+}
+
+.report-table th {
+  background-color: #007A65;
+  color: #FFFFFF;
+  text-align: left;
+  padding: 6px 10px;
+  font-size: 9.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.report-table td {
+  border-bottom: 1px solid #E5E7EB;
+  padding: 6px 10px;
+  vertical-align: middle;
+}
+
+.report-table tr:nth-child(even) td {
+  background-color: #F9FAFB;
+}
+
+.report-signature-box {
+  margin-top: 35px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  page-break-inside: avoid;
+}
+
+.signature-line {
+  border-top: 1.5px solid #4B5563;
+  padding-top: 6px;
+  text-align: center;
+  font-size: 9pt;
+  color: #374151;
+}
+
+.signature-role {
+  font-weight: 700;
+  color: #111827;
+}
