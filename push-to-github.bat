@@ -7,7 +7,7 @@ echo   Repositorio: inventario-recinto-quirama
 echo ===============================================================
 echo.
 
-set PATH=%PATH%;C:\Users\rmoralea\AppData\Local\Programs\Git\cmd;C:\Program Files\Git\cmd
+set PATH=%PATH%;C:\Users\rmoralea\AppData\Local\Programs\Git\cmd;C:\Users\rmoralea\AppData\Local\Microsoft\WinGet\Packages\GitHub.cli_Microsoft.Winget.Source_8wekyb3d8bbwe\bin;C:\Program Files\Git\cmd
 
 echo [1/4] Verificando instalacion de Git...
 git --version

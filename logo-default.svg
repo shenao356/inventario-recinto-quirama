@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="100%" height="100%">
   <defs>
     <linearGradient id="comfenalcoGreen" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#008F7A" />
-      <stop offset="100%" stop-color="#005B4E" />
+      <stop offset="0%" stop-color="#00A656" />
+      <stop offset="100%" stop-color="#005428" />
     </linearGradient>
     <linearGradient id="accentGold" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#E2B159" />
@@ -11,9 +11,9 @@
   </defs>
 
   <!-- Background container subtle rounded box -->
-  <rect x="2" y="2" width="496" height="116" rx="16" fill="#F4FAF8" stroke="#D1EBE5" stroke-width="1.5"/>
+  <rect x="2" y="2" width="496" height="116" rx="16" fill="#F0FAF5" stroke="#C5EDD8" stroke-width="1.5"/>
 
-  <!-- Quirama Colonial Arch & Nature Embellishment -->
+  <!-- Quirama Colonial Arch & Comfenalco Green Embellishment -->
   <g transform="translate(18, 15)">
     <!-- Shield / Emblem back -->
     <rect x="0" y="0" width="90" height="90" rx="14" fill="url(#comfenalcoGreen)"/>
@@ -33,23 +33,20 @@
   </g>
 
   <!-- Typography -->
-  <!-- Main Title -->
-  <text x="124" y="46" font-family="'Segoe UI', Roboto, 'Helvetica Neue', sans-serif" font-size="24" font-weight="800" fill="#0A3C33" letter-spacing="1">
+  <text x="124" y="46" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="900" fill="#003E1D" letter-spacing="1">
     HOTEL RECINTO QUIRAMA
   </text>
   
-  <!-- Subtitle with Comfenalco Brand Identity -->
-  <text x="124" y="72" font-family="'Segoe UI', Roboto, 'Helvetica Neue', sans-serif" font-size="14" font-weight="600" fill="#008F7A" letter-spacing="1.5">
+  <text x="124" y="72" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="14.5" font-weight="800" fill="#008848" letter-spacing="1.5">
     COMFENALCO ANTIOQUIA
   </text>
   
-  <!-- Department Badge -->
-  <rect x="124" y="82" width="220" height="20" rx="4" fill="#008F7A" fill-opacity="0.12"/>
-  <text x="132" y="96" font-family="'Segoe UI', Roboto, 'Helvetica Neue', sans-serif" font-size="10.5" font-weight="700" fill="#006D5C" letter-spacing="0.8">
+  <rect x="124" y="82" width="230" height="22" rx="5" fill="#008848" fill-opacity="0.15"/>
+  <text x="132" y="97" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="10.5" font-weight="800" fill="#005428" letter-spacing="0.8">
     CONTROL DE INVENTARIO Y DOTACIÓN
   </text>
 
   <!-- Right Decorative Leaf/Knot -->
-  <path d="M 465 30 C 475 45 470 70 450 85 C 445 65 455 45 465 30 Z" fill="#008F7A" fill-opacity="0.25"/>
-  <path d="M 475 42 C 482 52 478 68 466 78 C 462 64 468 50 475 42 Z" fill="#E2B159" fill-opacity="0.6"/>
+  <path d="M 465 30 C 475 45 470 70 450 85 C 445 65 455 45 465 30 Z" fill="#008848" fill-opacity="0.25"/>
+  <path d="M 475 42 C 482 52 478 68 466 78 C 462 64 468 50 475 42 Z" fill="#E2B159" fill-opacity="0.7"/>
 </svg>

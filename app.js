@@ -26,7 +26,7 @@ const DEFAULT_CATALOG = [
   { id: 'cat-16', name: 'Ganchos de ropa en clóset', category: 'Mobiliario', standardQty: 6 },
   { id: 'cat-17', name: 'Papelera de baño con pedal', category: 'Aseo y Baño', standardQty: 1 },
   { id: 'cat-18', name: 'Papelera de habitación', category: 'Accesorios de Habitación', standardQty: 1 },
-  { id: 'cat-19', name: 'Directorio telefónico y menú de servicios', category: 'Información', standardQty: 1 },
+  { id: 'cat-19', name: 'Directorio telefónico y menú', category: 'Información', standardQty: 1 },
   { id: 'cat-20', name: 'Dispensador de jabón y champú', category: 'Aseo y Baño', standardQty: 1 }
 ];
 
@@ -35,23 +35,22 @@ const DEFAULT_SETTINGS = {
   entityName: 'Comfenalco Antioquia',
   department: 'Departamento de Ama de Llaves y Habitaciones',
   location: 'El Carmen de Viboral - Rionegro, Antioquia',
-  logo: null, // null usará logo-default.svg
+  logo: null,
   roomCount: 60,
   numbering: '101-160',
   catalog: DEFAULT_CATALOG
 };
 
 // ==============================================================
-// 2. ESTADO GLOBAL DE LA APLICACIÓN
+// 2. ESTADO GLOBAL
 // ==============================================================
 let appSettings = {};
 let appRooms = {};
 let currentRoomId = '101';
 let currentSearchTerm = '';
 
-// Claves de Almacenamiento Local
-const STORAGE_SETTINGS_KEY = 'quirama_hotel_settings_v2';
-const STORAGE_ROOMS_KEY = 'quirama_hotel_rooms_v2';
+const STORAGE_SETTINGS_KEY = 'quirama_hotel_settings_v3';
+const STORAGE_ROOMS_KEY = 'quirama_hotel_rooms_v3';
 
 // ==============================================================
 // 3. INICIALIZACIÓN
@@ -72,7 +71,6 @@ function initLucide() {
   }
 }
 
-// Carga de Configuración
 function loadSettings() {
   try {
     const saved = localStorage.getItem(STORAGE_SETTINGS_KEY);
@@ -98,16 +96,14 @@ function saveSettingsToStorage() {
 }
 
 function applySettingsToUI() {
-  // Título e imagen de cabecera
   const headerTitle = document.getElementById('header-hotel-title');
   if (headerTitle) headerTitle.textContent = appSettings.hotelName;
 
   const headerSub = document.getElementById('header-hotel-subtitle');
   if (headerSub) {
-    headerSub.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>${appSettings.entityName} · Control de Inventario`;
+    headerSub.innerHTML = `<span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-300 animate-pulse"></span>${appSettings.entityName} · Control de Inventario`;
   }
 
-  // Logo
   const logoSrc = appSettings.logo || 'logo-default.svg';
   const headerLogo = document.getElementById('hotel-header-logo');
   if (headerLogo) headerLogo.src = logoSrc;
@@ -118,7 +114,6 @@ function applySettingsToUI() {
   const printLogo = document.getElementById('print-logo');
   if (printLogo) printLogo.src = logoSrc;
 
-  // Ajustes de impresión
   const printHotel = document.getElementById('print-hotel-name');
   if (printHotel) printHotel.textContent = appSettings.hotelName.toUpperCase();
 
@@ -127,28 +122,8 @@ function applySettingsToUI() {
 
   const printDept = document.getElementById('print-hotel-dept');
   if (printDept) printDept.textContent = appSettings.department.toUpperCase();
-
-  // Inputs en modal de ajustes
-  const nameInput = document.getElementById('settings-hotel-name');
-  if (nameInput) nameInput.value = appSettings.hotelName;
-
-  const entityInput = document.getElementById('settings-hotel-entity');
-  if (entityInput) entityInput.value = appSettings.entityName;
-
-  const deptInput = document.getElementById('settings-hotel-dept');
-  if (deptInput) deptInput.value = appSettings.department;
-
-  const locInput = document.getElementById('settings-hotel-location');
-  if (locInput) locInput.value = appSettings.location;
-
-  const countInput = document.getElementById('settings-room-count');
-  if (countInput) countInput.value = appSettings.roomCount || 60;
-
-  const numInput = document.getElementById('settings-room-numbering');
-  if (numInput) numInput.value = appSettings.numbering || '101-160';
 }
 
-// Carga de Habitaciones (Crea las 60 habitaciones por defecto si no existen)
 function loadRooms() {
   try {
     const saved = localStorage.getItem(STORAGE_ROOMS_KEY);
@@ -162,7 +137,6 @@ function loadRooms() {
     generateInitialRooms();
   }
 
-  // Asegurar que currentRoomId exista
   const roomKeys = Object.keys(appRooms);
   if (roomKeys.length > 0 && !appRooms[currentRoomId]) {
     currentRoomId = roomKeys[0];
@@ -182,7 +156,6 @@ function generateInitialRooms() {
 }
 
 function createEmptyRoom(num) {
-  // Clona el catálogo base con cantidades esperadas
   const catalog = appSettings.catalog || DEFAULT_CATALOG;
   const items = catalog.map((item, idx) => ({
     id: `item-${Date.now()}-${idx}-${Math.floor(Math.random() * 1000)}`,
@@ -194,7 +167,6 @@ function createEmptyRoom(num) {
     observation: ''
   }));
 
-  // Determinación de tipo de habitación por rango
   let type = 'Estándar Colonial';
   const n = parseInt(num, 10);
   if (n % 10 === 0) type = 'Suite Quirama';
@@ -207,7 +179,7 @@ function createEmptyRoom(num) {
     housekeeper: '',
     auditor: '',
     date: new Date().toISOString().slice(0, 16),
-    status: 'pending', // 'ok', 'warn', 'pending'
+    status: 'pending',
     notes: '',
     items: items
   };
@@ -218,24 +190,18 @@ function saveRoomsToStorage() {
     localStorage.setItem(STORAGE_ROOMS_KEY, JSON.stringify(appRooms));
   } catch (e) {
     console.error('Error guardando habitaciones:', e);
-    showToast('Error de almacenamiento local', 'error');
   }
 }
 
 // ==============================================================
-// 4. CONTROL DE HABITACIÓN ACTIVA Y SELECTOR
+// 4. CONTROL DE HABITACIÓN ACTIVA
 // ==============================================================
 function populateRoomSelect() {
   const select = document.getElementById('room-select');
   if (!select) return;
 
   select.innerHTML = '';
-  const roomIds = Object.keys(appRooms).sort((a, b) => {
-    const numA = parseInt(a, 10);
-    const numB = parseInt(b, 10);
-    if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-    return a.localeCompare(b);
-  });
+  const roomIds = Object.keys(appRooms).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
 
   roomIds.forEach(id => {
     const opt = document.createElement('option');
@@ -274,7 +240,6 @@ function setCurrentDateTime() {
   const dateInput = document.getElementById('room-date-input');
   if (dateInput) {
     const now = new Date();
-    // Formato YYYY-MM-DDTHH:mm local
     const localIso = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
     dateInput.value = localIso;
     updateRoomMetadata('date', localIso);
@@ -286,23 +251,19 @@ function updateRoomMetadata(field, value) {
   if (!room) return;
 
   room[field] = value;
-  
-  // Si se ingresó responsable o fecha y estaba en 'pending', evalúa si marcarlo como 'ok' o 'warn'
   if (room.status === 'pending' && (room.housekeeper || room.auditor)) {
     recalculateRoomStatus(room);
   }
-
   saveRoomsToStorage();
 }
 
 // ==============================================================
-// 5. RENDERIZADO DE LA HABITACIÓN ACTUAL Y TABLA
+// 5. RENDERIZADO DE TABLA DE INVENTARIO
 // ==============================================================
 function renderActiveRoom() {
   const room = appRooms[currentRoomId];
   if (!room) return;
 
-  // Actualizar Metadatos en UI
   const typeInput = document.getElementById('room-type-input');
   if (typeInput) typeInput.value = room.type || 'Estándar Colonial';
 
@@ -318,13 +279,8 @@ function renderActiveRoom() {
   const notesInput = document.getElementById('room-general-notes');
   if (notesInput) notesInput.value = room.notes || '';
 
-  // Actualizar Insignia de Estado de la Habitación
   updateRoomStatusBadge(room);
-
-  // Renderizar la tabla de ítems
   renderItemsTable(room);
-
-  // Actualizar contadores
   updateRoomCounters(room);
   updateGlobalStats();
   initLucide();
@@ -332,20 +288,19 @@ function renderActiveRoom() {
 
 function updateRoomStatusBadge(room) {
   const badge = document.getElementById('room-status-badge');
-  const text = document.getElementById('room-status-text');
-  if (!badge || !text) return;
+  if (!badge) return;
 
   badge.className = 'px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-sm';
 
   if (room.status === 'ok') {
     badge.classList.add('badge-ok');
-    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span id="room-status-text">Conforme / Completo</span>`;
+    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-600"></span><span>Conforme (Todo OK)</span>`;
   } else if (room.status === 'warn') {
     badge.classList.add('badge-warn');
-    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span><span id="room-status-text">Con Novedades / Faltantes</span>`;
+    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span><span>Con Novedades / Faltantes</span>`;
   } else {
     badge.classList.add('badge-pending');
-    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span><span id="room-status-text">Sin Inspección</span>`;
+    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span><span>Sin Inspección</span>`;
   }
 }
 
@@ -376,58 +331,51 @@ function renderItemsTable(room) {
 
   filteredItems.forEach((item, index) => {
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-slate-50/80 transition-colors border-b border-slate-100';
+    tr.className = 'hover:bg-brand-50/50 transition-colors border-b border-slate-100';
 
-    // Determinar estilo según coincidencia de cantidades y estado
     const isDiscrepant = item.actualQty !== item.standardQty || item.status !== 'Completo / Buen estado';
-    const rowAlertBg = isDiscrepant ? 'bg-amber-50/40' : '';
     if (isDiscrepant) tr.classList.add('bg-amber-50/40');
 
-    // Categoría badge
-    const catBadgeClass = getCategoryBadgeClass(item.category);
-
     tr.innerHTML = `
-      <td class="py-3 px-4 text-center font-semibold text-slate-400 text-xs">
+      <td class="py-3.5 px-4 text-center font-bold text-slate-400 text-xs">
         ${index + 1}
       </td>
 
-      <td class="py-3 px-4">
-        <div class="font-bold text-slate-800 text-sm flex items-center gap-2">
-          <span>${escapeHTML(item.name)}</span>
+      <td class="py-3.5 px-4">
+        <div class="font-bold text-slate-900 text-sm">
+          ${escapeHTML(item.name)}
         </div>
-        <div class="mt-0.5">
-          <span class="inline-block px-2 py-0.5 rounded text-[10px] font-semibold ${catBadgeClass}">
-            ${escapeHTML(item.category || 'General')}
-          </span>
+        <div class="text-[11px] font-semibold text-brand-700">
+          ${escapeHTML(item.category || 'General')}
         </div>
       </td>
 
-      <td class="py-3 px-3 text-center">
-        <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 font-bold text-slate-700 text-sm border border-slate-200">
+      <td class="py-3.5 px-3 text-center">
+        <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 font-extrabold text-slate-700 text-sm border border-slate-200">
           ${item.standardQty}
         </span>
       </td>
 
-      <td class="py-3 px-4">
+      <td class="py-3.5 px-4">
         <div class="flex items-center justify-center gap-1.5">
-          <button type="button" onclick="modifyItemQty('${item.id}', -1)" class="qty-btn bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-600 border border-slate-200" title="Disminuir cantidad">
+          <button type="button" onclick="modifyItemQty('${item.id}', -1)" class="qty-btn bg-slate-100 hover:bg-red-50 hover:text-red-700 text-slate-700 border border-slate-200" title="Disminuir">
             -
           </button>
           
           <input type="number" min="0" value="${item.actualQty}" 
             onchange="setItemQtyDirect('${item.id}', this.value)" 
-            class="w-14 text-center py-1.5 px-1 font-extrabold text-sm rounded-lg border-2 ${item.actualQty < item.standardQty ? 'border-amber-400 bg-amber-50 text-amber-900' : 'border-slate-200 bg-white text-slate-800'} focus:outline-none focus:ring-2 focus:ring-brand-500">
+            class="w-14 text-center py-1.5 px-1 font-black text-sm rounded-lg border-2 ${item.actualQty < item.standardQty ? 'border-amber-400 bg-amber-50 text-amber-900' : 'border-emerald-300 bg-white text-slate-800'} focus:outline-none focus:ring-2 focus:ring-brand-500">
 
-          <button type="button" onclick="modifyItemQty('${item.id}', 1)" class="qty-btn bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 border border-slate-200" title="Aumentar cantidad">
+          <button type="button" onclick="modifyItemQty('${item.id}', 1)" class="qty-btn bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 border border-slate-200" title="Aumentar">
             +
           </button>
         </div>
       </td>
 
-      <td class="py-3 px-3 text-center">
+      <td class="py-3.5 px-3 text-center">
         <select onchange="updateItemStatus('${item.id}', this.value)" 
-          class="text-xs font-semibold rounded-lg p-1.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 ${getStatusSelectClass(item.status)}">
-          <option value="Completo / Buen estado" ${item.status === 'Completo / Buen estado' ? 'selected' : ''}>✅ Buen estado</option>
+          class="text-xs font-bold rounded-lg p-2 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 ${getStatusSelectClass(item.status)}">
+          <option value="Completo / Buen estado" ${item.status === 'Completo / Buen estado' ? 'selected' : ''}>✅ Buen estado (OK)</option>
           <option value="Faltante" ${item.status === 'Faltante' ? 'selected' : ''}>❌ Faltante</option>
           <option value="Dañado" ${item.status === 'Dañado' ? 'selected' : ''}>⚠️ Dañado</option>
           <option value="Manchado / Sucio" ${item.status === 'Manchado / Sucio' ? 'selected' : ''}>🧺 Manchado/Sucio</option>
@@ -435,14 +383,14 @@ function renderItemsTable(room) {
         </select>
       </td>
 
-      <td class="py-3 px-4">
+      <td class="py-3.5 px-4">
         <input type="text" value="${escapeHTML(item.observation || '')}" 
-          placeholder="Novedad (ej. Roto, sin pila...)" 
+          placeholder="Escriba novedad o deje vacío..." 
           oninput="updateItemObservation('${item.id}', this.value)"
-          class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-700">
+          class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-800">
       </td>
 
-      <td class="py-3 px-3 text-center">
+      <td class="py-3.5 px-3 text-center">
         <button type="button" onclick="deleteItem('${item.id}')" 
           class="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition" title="Eliminar artículo de esta habitación">
           <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -452,27 +400,6 @@ function renderItemsTable(room) {
 
     tbody.appendChild(tr);
   });
-}
-
-function getCategoryBadgeClass(category) {
-  switch (category) {
-    case 'Tecnología':
-      return 'bg-blue-100 text-blue-800';
-    case 'Lencería y Baño':
-      return 'bg-teal-100 text-teal-800';
-    case 'Ropa de Cama':
-      return 'bg-indigo-100 text-indigo-800';
-    case 'Accesorios de Habitación':
-      return 'bg-amber-100 text-amber-800';
-    case 'Electrodomésticos':
-      return 'bg-purple-100 text-purple-800';
-    case 'Menaje':
-      return 'bg-emerald-100 text-emerald-800';
-    case 'Mobiliario':
-      return 'bg-stone-100 text-stone-800';
-    default:
-      return 'bg-slate-100 text-slate-700';
-  }
 }
 
 function getStatusSelectClass(status) {
@@ -492,7 +419,7 @@ function getStatusSelectClass(status) {
 }
 
 // ==============================================================
-// 6. OPERACIONES SOBRE ELEMENTOS DEL INVENTARIO
+// 6. OPERACIONES SOBRE ELEMENTOS
 // ==============================================================
 function modifyItemQty(itemId, delta) {
   const room = appRooms[currentRoomId];
@@ -501,18 +428,14 @@ function modifyItemQty(itemId, delta) {
   const item = room.items.find(i => i.id === itemId);
   if (!item) return;
 
-  const newQty = Math.max(0, parseInt(item.actualQty || 0, 10) + delta);
-  item.actualQty = newQty;
+  item.actualQty = Math.max(0, parseInt(item.actualQty || 0, 10) + delta);
 
-  // Auto-ajuste de estado según cantidad
   if (item.actualQty === 0 && item.standardQty > 0) {
     item.status = 'Faltante';
   } else if (item.actualQty < item.standardQty) {
     if (item.status === 'Completo / Buen estado') item.status = 'Faltante';
   } else if (item.actualQty === item.standardQty && item.status === 'Faltante') {
     item.status = 'Completo / Buen estado';
-  } else if (item.actualQty > item.standardQty) {
-    item.status = 'Excedente';
   }
 
   recalculateRoomStatus(room);
@@ -527,8 +450,7 @@ function setItemQtyDirect(itemId, value) {
   const item = room.items.find(i => i.id === itemId);
   if (!item) return;
 
-  const newQty = Math.max(0, parseInt(value, 10) || 0);
-  item.actualQty = newQty;
+  item.actualQty = Math.max(0, parseInt(value, 10) || 0);
 
   if (item.actualQty === 0 && item.standardQty > 0) {
     item.status = 'Faltante';
@@ -572,9 +494,7 @@ function deleteItem(itemId) {
   const item = room.items.find(i => i.id === itemId);
   const itemName = item ? item.name : 'este artículo';
 
-  if (!confirm(`¿Deseas eliminar "${itemName}" del inventario de la Habitación ${currentRoomId}?`)) {
-    return;
-  }
+  if (!confirm(`¿Eliminar "${itemName}" de la Habitación ${currentRoomId}?`)) return;
 
   room.items = room.items.filter(i => i.id !== itemId);
   recalculateRoomStatus(room);
@@ -586,7 +506,6 @@ function deleteItem(itemId) {
 function recalculateRoomStatus(room) {
   if (!room) return;
 
-  // Si no tiene registros de camarera/auditor, se mantiene o pasa a 'ok'/'warn' según inspección
   let hasDiscrepancy = false;
   for (const item of room.items) {
     if (item.actualQty !== item.standardQty || item.status !== 'Completo / Buen estado') {
@@ -598,7 +517,6 @@ function recalculateRoomStatus(room) {
   if (hasDiscrepancy) {
     room.status = 'warn';
   } else {
-    // Si no hay discrepancias y fue revisada
     room.status = (room.housekeeper || room.auditor || room.date) ? 'ok' : 'pending';
   }
 }
@@ -671,9 +589,7 @@ function resetCurrentRoomToStandard() {
   const room = appRooms[currentRoomId];
   if (!room) return;
 
-  if (!confirm(`¿Restablecer el inventario de la Habitación ${currentRoomId} a las cantidades y elementos estándar del catálogo?`)) {
-    return;
-  }
+  if (!confirm(`¿Restablecer inventario de la Habitación ${currentRoomId} a los valores estándar?`)) return;
 
   const catalog = appSettings.catalog || DEFAULT_CATALOG;
   room.items = catalog.map((item, idx) => ({
@@ -689,14 +605,14 @@ function resetCurrentRoomToStandard() {
   recalculateRoomStatus(room);
   saveRoomsToStorage();
   renderActiveRoom();
-  showToast(`Inventario de Habitación ${currentRoomId} restablecido`, 'success');
+  showToast(`Habitación ${currentRoomId} restablecida`, 'success');
 }
 
 function saveCurrentRoomManual() {
   saveRoomsToStorage();
   populateRoomSelect();
   updateGlobalStats();
-  showToast(`Habitación ${currentRoomId} guardada correctamente`, 'success');
+  showToast(`Habitación ${currentRoomId} guardada con éxito`, 'success');
 }
 
 // ==============================================================
@@ -743,9 +659,7 @@ function handleAddItemSubmit(e) {
     recalculateRoomStatus(room);
   }
 
-  // Si el usuario eligió agregar a las 60 habitaciones y al catálogo
   if (addToAll) {
-    // Agregar al catálogo de ajustes
     if (!appSettings.catalog) appSettings.catalog = [...DEFAULT_CATALOG];
     appSettings.catalog.push({
       id: `cat-${Date.now()}`,
@@ -755,7 +669,6 @@ function handleAddItemSubmit(e) {
     });
     saveSettingsToStorage();
 
-    // Agregar a todas las demás habitaciones
     Object.keys(appRooms).forEach(rId => {
       if (rId !== currentRoomId) {
         appRooms[rId].items.push({
@@ -788,7 +701,6 @@ function openRoomMatrixModal() {
   if (!modal || !container) return;
 
   container.innerHTML = '';
-
   const roomIds = Object.keys(appRooms).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
 
   roomIds.forEach(id => {
@@ -801,11 +713,11 @@ function openRoomMatrixModal() {
     let statusText = 'Sin revisar';
 
     if (room.status === 'ok') {
-      bgClass = 'bg-emerald-50 border-emerald-300 text-emerald-900';
-      statusDot = 'bg-emerald-500';
+      bgClass = 'bg-emerald-50 border-emerald-400 text-emerald-950 font-bold';
+      statusDot = 'bg-brand-600';
       statusText = 'Conforme';
     } else if (room.status === 'warn') {
-      bgClass = 'bg-amber-50 border-amber-300 text-amber-900';
+      bgClass = 'bg-amber-50 border-amber-300 text-amber-900 font-bold';
       statusDot = 'bg-amber-500';
       statusText = 'Novedades';
     }
@@ -816,10 +728,10 @@ function openRoomMatrixModal() {
     }
 
     tile.innerHTML = `
-      <div class="text-[11px] font-semibold text-slate-400">HAB</div>
+      <div class="text-[11px] font-bold text-slate-400">HAB</div>
       <div class="text-lg font-black tracking-tight">${id}</div>
       <div class="flex items-center gap-1 text-[10px] font-bold">
-        <span class="w-2 h-2 rounded-full ${statusDot}"></span>
+        <span class="w-2.5 h-2.5 rounded-full ${statusDot}"></span>
         <span>${statusText}</span>
       </div>
     `;
@@ -842,239 +754,224 @@ function closeRoomMatrixModal() {
 }
 
 // ==============================================================
-// 9. MODAL: AJUSTES, LOGO Y RESPALDO
+// 9. MODAL: CONFIGURAR DOCUMENTO DE IMPRESIÓN, PDF Y FIRMAS
 // ==============================================================
-function openSettingsModal() {
-  const modal = document.getElementById('modal-settings');
+function openPrintModal() {
+  const modal = document.getElementById('modal-print-config');
   if (!modal) return;
-  applySettingsToUI();
+
+  const room = appRooms[currentRoomId];
+
+  // Poblar valores por defecto
+  const hotelIn = document.getElementById('doc-hotel-input');
+  if (hotelIn) hotelIn.value = appSettings.hotelName.toUpperCase();
+
+  const entityIn = document.getElementById('doc-entity-input');
+  if (entityIn) entityIn.value = appSettings.entityName.toUpperCase();
+
+  const deptIn = document.getElementById('doc-dept-input');
+  if (deptIn) deptIn.value = appSettings.department.toUpperCase();
+
+  const notesIn = document.getElementById('doc-notes-input');
+  if (notesIn) notesIn.value = (room && room.notes) ? room.notes : '';
+
+  // Nombres en firmas
+  const sign1Name = document.getElementById('sign1-name');
+  if (sign1Name && room) sign1Name.value = room.housekeeper || '';
+
+  const sign2Name = document.getElementById('sign2-name');
+  if (sign2Name && room) sign2Name.value = room.auditor || '';
+
+  updatePrintPreview();
   modal.classList.remove('hidden');
   initLucide();
 }
 
-function closeSettingsModal() {
-  const modal = document.getElementById('modal-settings');
+function closePrintModal() {
+  const modal = document.getElementById('modal-print-config');
   if (modal) modal.classList.add('hidden');
 }
 
-function handleLogoUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  if (!file.type.startsWith('image/')) {
-    alert('Por favor selecciona un archivo de imagen válido (PNG, JPG, SVG o WebP).');
-    return;
-  }
-
-  // Límite de tamaño sugerido 2MB
-  if (file.size > 2 * 1024 * 1024) {
-    alert('La imagen no debe superar los 2MB para asegurar un rendimiento óptimo.');
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const base64Data = e.target.result;
-    appSettings.logo = base64Data;
-    saveSettingsToStorage();
-    applySettingsToUI();
-    showToast('Logo actualizado con éxito', 'success');
-  };
-  reader.readAsDataURL(file);
-}
-
-function resetDefaultLogo() {
-  if (confirm('¿Deseas restaurar el logo inicial predeterminado del Hotel Recinto Quirama?')) {
-    appSettings.logo = null;
-    saveSettingsToStorage();
-    applySettingsToUI();
-    showToast('Logo restaurado al predeterminado', 'info');
-  }
-}
-
-function saveSettingsModal() {
-  const name = document.getElementById('settings-hotel-name').value.trim();
-  const entity = document.getElementById('settings-hotel-entity').value.trim();
-  const dept = document.getElementById('settings-hotel-dept').value.trim();
-  const location = document.getElementById('settings-hotel-location').value.trim();
-  const roomCount = parseInt(document.getElementById('settings-room-count').value, 10) || 60;
-  const numbering = document.getElementById('settings-room-numbering').value;
-
-  appSettings.hotelName = name || 'Hotel Recinto Quirama';
-  appSettings.entityName = entity || 'Comfenalco Antioquia';
-  appSettings.department = dept || 'Departamento de Ama de Llaves';
-  appSettings.location = location || 'El Carmen de Viboral - Rionegro';
-  
-  // Si cambió la cantidad de habitaciones o estilo
-  if (roomCount !== appSettings.roomCount || numbering !== appSettings.numbering) {
-    if (confirm('Has cambiado la cantidad o numeración de habitaciones. ¿Deseas regenerar la lista de habitaciones respetando las configuraciones?')) {
-      appSettings.roomCount = roomCount;
-      appSettings.numbering = numbering;
-      generateInitialRooms();
-      populateRoomSelect();
-      currentRoomId = Object.keys(appRooms)[0];
-    }
-  }
-
-  saveSettingsToStorage();
-  applySettingsToUI();
-  populateRoomSelect();
-  renderActiveRoom();
-  closeSettingsModal();
-  showToast('Ajustes guardados con éxito', 'success');
-}
-
-// Copia de Seguridad JSON
-function exportBackupData() {
-  const backupObject = {
-    version: '2.0',
-    exportDate: new Date().toISOString(),
-    hotel: appSettings.hotelName,
-    settings: appSettings,
-    rooms: appRooms
-  };
-
-  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backupObject, null, 2));
-  const downloadAnchor = document.createElement('a');
-  const dateStr = new Date().toISOString().slice(0, 10);
-  downloadAnchor.setAttribute('href', dataStr);
-  downloadAnchor.setAttribute('download', `inventario-recinto-quirama-backup-${dateStr}.json`);
-  document.body.appendChild(downloadAnchor);
-  downloadAnchor.click();
-  downloadAnchor.remove();
-  showToast('Copia de respaldo descargada', 'success');
-}
-
-function importBackupData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (data && data.rooms) {
-        if (confirm('Se importarán los datos del archivo. Esto sobreescribirá los inventarios actuales. ¿Deseas continuar?')) {
-          appRooms = data.rooms;
-          if (data.settings) appSettings = { ...DEFAULT_SETTINGS, ...data.settings };
-          saveRoomsToStorage();
-          saveSettingsToStorage();
-          applySettingsToUI();
-          populateRoomSelect();
-          currentRoomId = Object.keys(appRooms)[0];
-          renderActiveRoom();
-          closeSettingsModal();
-          showToast('Datos restaurados correctamente', 'success');
-        }
-      } else {
-        alert('El archivo no contiene un formato de respaldo válido de inventario.');
-      }
-    } catch (err) {
-      alert('Error leyendo el archivo JSON: ' + err.message);
-    }
-  };
-  reader.readAsText(file);
-}
-
-function resetAllFactoryData() {
-  if (confirm('⚠️ ¡ATENCIÓN! Se restablecerán todas las habitaciones y ajustes a los valores iniciales de fábrica. Se borrarán todas las modificaciones no respaldadas. ¿Estás completamente seguro?')) {
-    localStorage.removeItem(STORAGE_SETTINGS_KEY);
-    localStorage.removeItem(STORAGE_ROOMS_KEY);
-    appSettings = { ...DEFAULT_SETTINGS };
-    generateInitialRooms();
-    applySettingsToUI();
-    populateRoomSelect();
-    currentRoomId = Object.keys(appRooms)[0];
-    renderActiveRoom();
-    closeSettingsModal();
-    showToast('Sistema reiniciado a valores de fábrica', 'info');
-  }
-}
-
-// ==============================================================
-// 10. GENERACIÓN DE FORMATO OFICIAL (PDF, IMAGEN, IMPRESIÓN)
-// ==============================================================
-function preparePrintReport() {
+function updatePrintPreview() {
   const room = appRooms[currentRoomId];
-  if (!room) return null;
+  if (!room) return;
 
-  // Llenar datos de encabezado
-  const numEl = document.getElementById('print-room-number');
-  if (numEl) numEl.textContent = room.id;
+  const printable = document.getElementById('printable-report');
+  if (!printable) return;
 
-  const typeEl = document.getElementById('print-room-type');
-  if (typeEl) typeEl.textContent = room.type || 'Estándar';
+  // 1. Tamaño de la letra
+  const fontSizeSelect = document.getElementById('doc-font-size');
+  const selectedSize = fontSizeSelect ? fontSizeSelect.value : 'report-font-large';
+  printable.classList.remove('report-font-large', 'report-font-xlarge', 'report-font-normal');
+  printable.classList.add(selectedSize);
 
-  const dateEl = document.getElementById('print-room-date');
-  if (dateEl) {
+  // 2. Encabezados
+  const titleIn = document.getElementById('doc-title-input');
+  const printTitle = document.getElementById('print-main-title');
+  if (printTitle) printTitle.textContent = titleIn ? titleIn.value.toUpperCase() : 'CONTROL DE INVENTARIO';
+
+  const codeIn = document.getElementById('doc-code-input');
+  const printCode = document.getElementById('print-doc-code');
+  if (printCode) printCode.textContent = codeIn ? `Código: ${codeIn.value}` : 'Código: F-REC-INV-01';
+
+  const hotelIn = document.getElementById('doc-hotel-input');
+  const printHotel = document.getElementById('print-hotel-name');
+  if (printHotel) printHotel.textContent = hotelIn ? hotelIn.value.toUpperCase() : 'HOTEL RECINTO QUIRAMA';
+
+  const entityIn = document.getElementById('doc-entity-input');
+  const printEntity = document.getElementById('print-hotel-entity');
+  if (printEntity) printEntity.textContent = entityIn ? entityIn.value.toUpperCase() : 'COMFENALCO ANTIOQUIA';
+
+  const deptIn = document.getElementById('doc-dept-input');
+  const printDept = document.getElementById('print-hotel-dept');
+  if (printDept) printDept.textContent = deptIn ? deptIn.value.toUpperCase() : '';
+
+  // 3. Datos de la Habitación
+  const roomNum = document.getElementById('print-room-number');
+  if (roomNum) roomNum.textContent = room.id;
+
+  const roomType = document.getElementById('print-room-type');
+  if (roomType) roomType.textContent = room.type || 'Estándar';
+
+  const roomDate = document.getElementById('print-room-date');
+  if (roomDate) {
     const d = room.date ? new Date(room.date) : new Date();
-    dateEl.textContent = isNaN(d.getTime()) ? room.date : d.toLocaleString('es-CO');
+    roomDate.textContent = isNaN(d.getTime()) ? room.date : d.toLocaleString('es-CO');
   }
 
-  const statEl = document.getElementById('print-room-status');
-  if (statEl) {
+  const roomStatus = document.getElementById('print-room-status');
+  if (roomStatus) {
     if (room.status === 'ok') {
-      statEl.textContent = 'CONFORME (SIN NOVEDADES)';
-      statEl.style.color = '#065F46';
+      roomStatus.textContent = 'CONFORME (TODO OK)';
+      roomStatus.style.color = '#008848';
     } else if (room.status === 'warn') {
-      statEl.textContent = 'CON NOVEDADES / FALTANTES';
-      statEl.style.color = '#92400E';
+      roomStatus.textContent = 'CON NOVEDADES / FALTANTES';
+      roomStatus.style.color = '#D97706';
     } else {
-      statEl.textContent = 'PENDIENTE INSPECCIÓN';
-      statEl.style.color = '#4B5563';
+      roomStatus.textContent = 'SIN INSPECCIÓN';
+      roomStatus.style.color = '#475569';
     }
   }
 
-  const hkEl = document.getElementById('print-room-housekeeper');
-  if (hkEl) hkEl.textContent = room.housekeeper ? room.housekeeper.toUpperCase() : 'NO ASIGNADA';
+  // 4. Modo de Contenido de la Tabla (Todo vs Solo Novedades)
+  const modeSelect = document.getElementById('doc-content-mode');
+  const onlyIssues = modeSelect && modeSelect.value === 'only-issues';
 
-  const audEl = document.getElementById('print-room-auditor');
-  if (audEl) audEl.textContent = room.auditor ? room.auditor.toUpperCase() : 'NO ASIGNADO';
+  const tbody = document.getElementById('print-table-tbody');
+  if (tbody) {
+    tbody.innerHTML = '';
+    let itemsToPrint = room.items || [];
 
-  const notesEl = document.getElementById('print-room-notes');
-  if (notesEl) {
-    notesEl.textContent = room.notes && room.notes.trim() ? room.notes : 'Sin observaciones adicionales registradas.';
-  }
+    if (onlyIssues) {
+      itemsToPrint = itemsToPrint.filter(i => i.actualQty !== i.standardQty || i.status !== 'Completo / Buen estado');
+    }
 
-  // Llenar tabla de elementos
-  const printTbody = document.getElementById('print-table-tbody');
-  if (printTbody) {
-    printTbody.innerHTML = '';
-    (room.items || []).forEach((item, index) => {
+    if (itemsToPrint.length === 0) {
       const tr = document.createElement('tr');
-      const isWarn = item.actualQty !== item.standardQty || item.status !== 'Completo / Buen estado';
-      if (isWarn) tr.style.backgroundColor = '#FEF3C7';
-
       tr.innerHTML = `
-        <td style="text-align: center; font-weight: bold; color: #6B7280; font-size: 8.5pt;">${index + 1}</td>
-        <td style="font-weight: 700; color: #111827;">${escapeHTML(item.name)}</td>
-        <td style="color: #4B5563; font-size: 8.5pt;">${escapeHTML(item.category || '-')}</td>
-        <td style="text-align: center; font-weight: bold;">${item.standardQty}</td>
-        <td style="text-align: center; font-weight: 800; color: ${isWarn ? '#B45309' : '#047857'};">${item.actualQty}</td>
-        <td style="text-align: center; font-weight: 600; font-size: 8.5pt;">${escapeHTML(item.status)}</td>
-        <td style="font-size: 8.5pt; color: #374151;">${escapeHTML(item.observation || '-')}</td>
+        <td colspan="5" style="text-align: center; padding: 25px; font-size: 13pt; font-weight: bold; color: #008848;">
+          ✅ Toda la dotación de la Habitación ${room.id} se encuentra completa y en perfecto estado (Sin novedades).
+        </td>
       `;
-      printTbody.appendChild(tr);
-    });
+      tbody.appendChild(tr);
+    } else {
+      itemsToPrint.forEach((item, idx) => {
+        const tr = document.createElement('tr');
+        const isOk = item.actualQty === item.standardQty && item.status === 'Completo / Buen estado';
+
+        let badgeHtml = '';
+        if (isOk) {
+          badgeHtml = '<span class="report-badge-ok">✅ OK</span>';
+        } else if (item.status === 'Faltante' || item.actualQty < item.standardQty) {
+          badgeHtml = '<span class="report-badge-warn">❌ FALTANTE</span>';
+        } else if (item.status === 'Dañado') {
+          badgeHtml = '<span class="report-badge-warn">⚠️ DAÑADO</span>';
+        } else if (item.status === 'Manchado / Sucio') {
+          badgeHtml = '<span class="report-badge-warn">🧺 MANCHADO</span>';
+        } else {
+          badgeHtml = `<span class="report-badge-warn">${escapeHTML(item.status)}</span>`;
+        }
+
+        let obsText = item.observation && item.observation.trim() ? item.observation : (isOk ? 'Sin novedad' : 'Verificar reposición');
+
+        tr.innerHTML = `
+          <td style="text-align: center; font-weight: bold; color: #475569; width: 35px;">${idx + 1}</td>
+          <td style="font-weight: 800; color: #0F172A; font-size: 11.5pt;">${escapeHTML(item.name)}</td>
+          <td style="text-align: center; font-weight: 900; font-size: 12pt; color: ${isOk ? '#008848' : '#D97706'};">${item.actualQty}</td>
+          <td style="text-align: center;">${badgeHtml}</td>
+          <td style="font-size: 10.5pt; color: #1E293B; font-weight: ${isOk ? 'normal' : 'bold'};">${escapeHTML(obsText)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
   }
 
-  const printableElement = document.getElementById('printable-report');
-  return printableElement;
+  // 5. Observaciones del Documento
+  const notesIn = document.getElementById('doc-notes-input');
+  const printNotes = document.getElementById('print-room-notes');
+  if (printNotes) {
+    printNotes.textContent = notesIn && notesIn.value.trim() ? notesIn.value : 'Sin novedades adicionales reportadas.';
+  }
+
+  // 6. Firmas Personalizables
+  applySignatureBlock('1');
+  applySignatureBlock('2');
+  applySignatureBlock('3');
+
+  // Ajustar columnas de la caja de firmas según las habilitadas
+  const signContainer = document.getElementById('print-signatures-container');
+  if (signContainer) {
+    const s1 = document.getElementById('sign1-enable').checked;
+    const s2 = document.getElementById('sign2-enable').checked;
+    const s3 = document.getElementById('sign3-enable').checked;
+    const activeCount = (s1 ? 1 : 0) + (s2 ? 1 : 0) + (s3 ? 1 : 0);
+    signContainer.style.gridTemplateColumns = `repeat(${Math.max(1, activeCount)}, 1fr)`;
+  }
 }
 
-// Descargar en Formato PDF
-function exportToPDF() {
-  const element = preparePrintReport();
+function applySignatureBlock(num) {
+  const enable = document.getElementById(`sign${num}-enable`).checked;
+  const box = document.getElementById(`print-sign-${num}-box`);
+  if (!box) return;
+
+  if (!enable) {
+    box.style.display = 'none';
+    return;
+  }
+  box.style.display = 'block';
+
+  const roleIn = document.getElementById(`sign${num}-role`).value;
+  const nameIn = document.getElementById(`sign${num}-name`).value;
+  const idIn = document.getElementById(`sign${num}-id`).value;
+
+  const roleEl = document.getElementById(`print-sign-${num}-role`);
+  if (roleEl) roleEl.textContent = roleIn || 'Firma';
+
+  const nameEl = document.getElementById(`print-sign-${num}-name`);
+  if (nameEl) nameEl.textContent = nameIn ? nameIn.toUpperCase() : '___________________';
+
+  const idEl = document.getElementById(`print-sign-${num}-id`);
+  if (idEl) idEl.textContent = idIn ? `C.C. ${idIn}` : 'C.C. ___________________';
+}
+
+// Ejecutar Impresión Física
+function executeDirectPrint() {
+  updatePrintPreview();
+  window.print();
+}
+
+// Ejecutar Descarga de PDF
+function executePDFExport() {
+  updatePrintPreview();
+  const element = document.getElementById('printable-report');
   if (!element) return;
 
-  showToast('Generando documento PDF...', 'info');
-
-  // Hacer visible temporalmente para renderizado
+  showToast('Generando documento PDF en alta resolución...', 'info');
   element.style.display = 'block';
 
   const opt = {
     margin: [8, 8, 8, 8],
-    filename: `Inventario_Habitacion_${currentRoomId}_Recinto_Quirama.pdf`,
+    filename: `Inventario_Habitacion_${currentRoomId}_Quirama.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { scale: 2, useCORS: true, logging: false },
     jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
@@ -1086,13 +983,14 @@ function exportToPDF() {
   }).catch(err => {
     element.style.display = 'none';
     console.error('Error al generar PDF:', err);
-    alert('Ocurrió un inconveniente al generar el PDF. Puedes usar el botón "Imprimir" para Guardar como PDF de forma nativa.');
+    alert('Ocurrió un inconveniente al generar el PDF. Puedes pulsar "Imprimir Físico" y seleccionar "Guardar como PDF".');
   });
 }
 
-// Descargar en Formato Imagen PNG
-function exportToImage() {
-  const element = preparePrintReport();
+// Ejecutar Descarga de Imagen PNG
+function executeImageExport() {
+  updatePrintPreview();
+  const element = document.getElementById('printable-report');
   if (!element) return;
 
   showToast('Generando imagen de alta resolución...', 'info');
@@ -1112,10 +1010,95 @@ function exportToImage() {
   });
 }
 
-// Imprimir directo con Diálogo del Navegador
-function printInventoryReport() {
-  preparePrintReport();
-  window.print();
+// ==============================================================
+// 10. MODAL DE AJUSTES GENERALES & LOGOTIPO
+// ==============================================================
+function openSettingsModal() {
+  const modal = document.getElementById('modal-settings');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  initLucide();
+}
+
+function closeSettingsModal() {
+  const modal = document.getElementById('modal-settings');
+  if (modal) modal.classList.add('hidden');
+}
+
+function handleLogoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith('image/')) {
+    alert('Por favor selecciona un archivo de imagen válido.');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    appSettings.logo = e.target.result;
+    saveSettingsToStorage();
+    applySettingsToUI();
+    showToast('Logo actualizado correctamente', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+
+function resetDefaultLogo() {
+  if (confirm('¿Deseas restaurar el logo inicial predeterminado?')) {
+    appSettings.logo = null;
+    saveSettingsToStorage();
+    applySettingsToUI();
+    showToast('Logo predeterminado restaurado', 'info');
+  }
+}
+
+function exportBackupData() {
+  const backupObject = {
+    version: '3.0',
+    exportDate: new Date().toISOString(),
+    hotel: appSettings.hotelName,
+    settings: appSettings,
+    rooms: appRooms
+  };
+
+  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backupObject, null, 2));
+  const a = document.createElement('a');
+  a.setAttribute('href', dataStr);
+  a.setAttribute('download', `inventario-quirama-backup-${new Date().toISOString().slice(0, 10)}.json`);
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  showToast('Copia de respaldo descargada', 'success');
+}
+
+function importBackupData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data && data.rooms) {
+        if (confirm('Se sobreescribirán los inventarios con el archivo importado. ¿Continuar?')) {
+          appRooms = data.rooms;
+          if (data.settings) appSettings = { ...DEFAULT_SETTINGS, ...data.settings };
+          saveRoomsToStorage();
+          saveSettingsToStorage();
+          applySettingsToUI();
+          populateRoomSelect();
+          currentRoomId = Object.keys(appRooms)[0];
+          renderActiveRoom();
+          closeSettingsModal();
+          showToast('Datos restaurados correctamente', 'success');
+        }
+      }
+    } catch (err) {
+      alert('Error en archivo: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
 }
 
 // ==============================================================
@@ -1138,17 +1121,17 @@ function showToast(message, type = 'info') {
   const toast = document.createElement('div');
   toast.className = 'toast';
 
-  let borderColor = '#007A65';
+  let borderColor = '#008848';
   let iconName = 'check-circle';
 
   if (type === 'success') {
-    borderColor = '#10B981';
+    borderColor = '#008848';
     iconName = 'check-circle-2';
   } else if (type === 'error') {
-    borderColor = '#EF4444';
+    borderColor = '#DC2626';
     iconName = 'alert-triangle';
   } else if (type === 'info') {
-    borderColor = '#3B82F6';
+    borderColor = '#2563EB';
     iconName = 'info';
   }
 
@@ -1157,7 +1140,7 @@ function showToast(message, type = 'info') {
   toast.innerHTML = `
     <div class="flex items-center gap-2.5">
       <i data-lucide="${iconName}" class="w-5 h-5" style="color: ${borderColor}"></i>
-      <span class="text-xs font-semibold text-slate-800">${escapeHTML(message)}</span>
+      <span class="text-xs font-bold text-slate-800">${escapeHTML(message)}</span>
     </div>
     <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600">
       <i data-lucide="x" class="w-3.5 h-3.5"></i>

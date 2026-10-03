@@ -1,27 +1,31 @@
 /* Hotel Recinto Quirama - Comfenalco Antioquia */
-/* Sistema de Control de Inventario de Habitaciones */
+/* Paleta Oficial Verde Corporativo Comfenalco Antioquia */
 
 :root {
-  --primary: #007A65;
-  --primary-hover: #006352;
-  --primary-dark: #0A3C33;
-  --primary-light: #E6F5F1;
-  --primary-subtle: #F0F9F7;
-  --accent-gold: #D99B26;
-  --accent-gold-light: #FEF6E9;
-  --status-ok: #10B981;
-  --status-ok-bg: #ECFDF5;
-  --status-warn: #F59E0B;
-  --status-warn-bg: #FFFBEB;
-  --status-danger: #EF4444;
-  --status-danger-bg: #FEF2F2;
-  --status-pending: #64748B;
+  /* Verde Corporativo Comfenalco Antioquia */
+  --primary: #008848;
+  --primary-hover: #00723A;
+  --primary-dark: #005428;
+  --primary-light: #E8F8F0;
+  --primary-subtle: #F2FBF6;
+  
+  /* Acentos y complementarios */
+  --accent-gold: #D69724;
+  --accent-gold-light: #FEF8ED;
+  --status-ok: #008848;
+  --status-ok-bg: #E8F8F0;
+  --status-warn: #D97706;
+  --status-warn-bg: #FEF3C7;
+  --status-danger: #DC2626;
+  --status-danger-bg: #FEE2E2;
+  --status-pending: #475569;
   --status-pending-bg: #F1F5F9;
+
   --text-main: #0F172A;
   --text-muted: #64748B;
-  --border-color: #E2E8F0;
+  --border-color: #CBD5E1;
   --card-bg: #FFFFFF;
-  --body-bg: #F8FAFC;
+  --body-bg: #F4FAF6;
   --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -39,17 +43,18 @@ body {
   min-height: 100vh;
 }
 
-/* Header Styles */
+/* Header Corporativo Comfenalco */
 .header-bar {
-  background: linear-gradient(135deg, #064E3B 0%, #007A65 100%);
+  background: linear-gradient(135deg, #005428 0%, #008848 60%, #00A656 100%);
   color: #FFFFFF;
-  box-shadow: 0 4px 15px rgba(0, 78, 59, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 84, 40, 0.25);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .brand-badge {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.16);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* Custom Scrollbar */
@@ -58,17 +63,17 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #E8F8F0;
 }
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #80C8A2;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #008848;
 }
 
-/* Room Matrix Grid */
+/* Matriz de 60 Habitaciones */
 .room-grid-tile {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
@@ -76,45 +81,45 @@ body {
 }
 .room-grid-tile:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 14px -2px rgba(0, 136, 72, 0.2);
 }
 .room-grid-tile.active-room {
-  outline: 3px solid var(--accent-gold);
-  box-shadow: 0 0 0 4px rgba(217, 155, 38, 0.3);
+  outline: 3px solid #008848;
+  box-shadow: 0 0 0 4px rgba(0, 136, 72, 0.35);
 }
 
-/* Status Badges */
+/* Insignias de Estado */
 .badge-ok {
   background-color: var(--status-ok-bg);
-  color: #065F46;
-  border: 1px solid #A7F3D0;
+  color: #005428;
+  border: 1.5px solid #80C8A2;
 }
 .badge-warn {
   background-color: var(--status-warn-bg);
   color: #92400E;
-  border: 1px solid #FDE68A;
+  border: 1.5px solid #FCD34D;
 }
 .badge-danger {
   background-color: var(--status-danger-bg);
   color: #991B1B;
-  border: 1px solid #FECACA;
+  border: 1.5px solid #FCA5A5;
 }
 .badge-pending {
   background-color: var(--status-pending-bg);
   color: #334155;
-  border: 1px solid #CBD5E1;
+  border: 1.5px solid #CBD5E1;
 }
 
-/* Quantity Control Buttons */
+/* Botones de Control de Cantidad */
 .qty-btn {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  font-weight: 700;
-  font-size: 1.1rem;
+  font-weight: 800;
+  font-size: 1.2rem;
   transition: all 0.15s ease;
   user-select: none;
 }
@@ -122,10 +127,10 @@ body {
   transform: scale(0.92);
 }
 
-/* Modal Transitions */
+/* Modales */
 .modal-backdrop {
-  background-color: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(4px);
+  background-color: rgba(5, 41, 20, 0.7);
+  backdrop-filter: blur(5px);
   transition: opacity 0.25s ease-out;
 }
 
@@ -136,7 +141,7 @@ body {
 @keyframes modalEnter {
   from {
     opacity: 0;
-    transform: scale(0.96) translateY(10px);
+    transform: scale(0.96) translateY(12px);
   }
   to {
     opacity: 1;
@@ -144,7 +149,7 @@ body {
   }
 }
 
-/* Toast Notification */
+/* Notificaciones Toast */
 #toast-container {
   position: fixed;
   bottom: 24px;
@@ -157,13 +162,13 @@ body {
 }
 .toast {
   pointer-events: auto;
-  min-width: 280px;
+  min-width: 290px;
   max-width: 420px;
   background: #FFFFFF;
-  border-left: 5px solid var(--primary);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
-  border-radius: 8px;
-  padding: 12px 18px;
+  border-left: 6px solid var(--primary);
+  box-shadow: 0 10px 25px -5px rgba(0, 84, 40, 0.25);
+  border-radius: 10px;
+  padding: 14px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -182,18 +187,30 @@ body {
 }
 
 /* ==============================================================
-   ESTILOS EXCLUSIVOS PARA IMPRESIÓN Y GENERACIÓN DE PDF
+   ESTILOS OPTIMIZADOS PARA DOCUMENTO IMPRESO / PDF
+   (Texto más amplio, diseño limpio, sin sobrecarga de datos)
    ============================================================== */
 #printable-report {
   display: none;
   background-color: #FFFFFF;
   color: #111827;
-  font-size: 11pt;
+  font-family: Arial, Helvetica, sans-serif;
   line-height: 1.4;
-  padding: 20mm 15mm;
+  padding: 16mm 14mm;
   width: 210mm; /* A4 width */
   margin: 0 auto;
   box-sizing: border-box;
+}
+
+/* Opciones de tamaño de fuente del reporte */
+.report-font-large {
+  font-size: 12.5pt !important;
+}
+.report-font-xlarge {
+  font-size: 14pt !important;
+}
+.report-font-normal {
+  font-size: 11pt !important;
 }
 
 @media print {
@@ -210,64 +227,94 @@ body {
     top: 0;
     width: 100%;
     margin: 0;
-    padding: 12mm 15mm;
+    padding: 10mm 12mm;
   }
   @page {
     size: letter portrait;
-    margin: 10mm;
+    margin: 8mm;
   }
 }
 
+/* Cabecera del Reporte */
 .report-header-box {
-  border-bottom: 2px solid #007A65;
+  border-bottom: 3px solid #008848;
   padding-bottom: 12px;
   margin-bottom: 16px;
 }
 
+/* Tabla Simplificada y Amplia */
 .report-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 14px;
-  font-size: 10pt;
 }
 
 .report-table th {
-  background-color: #007A65;
+  background-color: #008848;
   color: #FFFFFF;
   text-align: left;
-  padding: 6px 10px;
-  font-size: 9.5pt;
+  padding: 8px 12px;
+  font-size: 11.5pt;
+  font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  border: 1px solid #005428;
 }
 
 .report-table td {
-  border-bottom: 1px solid #E5E7EB;
-  padding: 6px 10px;
+  border: 1px solid #CBD5E1;
+  padding: 8px 12px;
   vertical-align: middle;
+  font-size: 11pt;
 }
 
 .report-table tr:nth-child(even) td {
-  background-color: #F9FAFB;
+  background-color: #F8FAF9;
 }
 
+/* Etiquetas de Estado en el Reporte Impreso */
+.report-badge-ok {
+  display: inline-block;
+  background-color: #E8F8F0;
+  color: #005428;
+  border: 1.5px solid #008848;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 10pt;
+}
+
+.report-badge-warn {
+  display: inline-block;
+  background-color: #FEF3C7;
+  color: #92400E;
+  border: 1.5px solid #F59E0B;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 10pt;
+}
+
+/* Sección de Firmas Amplia y Personalizable */
 .report-signature-box {
-  margin-top: 35px;
+  margin-top: 40px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 25px;
   page-break-inside: avoid;
 }
 
 .signature-line {
-  border-top: 1.5px solid #4B5563;
-  padding-top: 6px;
+  border-top: 2px solid #334155;
+  padding-top: 8px;
   text-align: center;
-  font-size: 9pt;
-  color: #374151;
+  font-size: 10pt;
+  color: #1E293B;
 }
 
 .signature-role {
-  font-weight: 700;
-  color: #111827;
+  font-weight: 800;
+  font-size: 10.5pt;
+  color: #005428;
+  margin-bottom: 2px;
 }
