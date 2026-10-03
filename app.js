@@ -1,7 +1,7 @@
 /**
  * Hotel Recinto Quirama - Comfenalco Antioquia
  * Sistema de Control de Inventario de Habitaciones
- * app.js
+ * app.js - Versión 5.0 (Soporte Completo para Bloques A-D y Casitas E-I)
  */
 
 // ==============================================================
@@ -30,14 +30,89 @@ const DEFAULT_CATALOG = [
   { id: 'cat-20', name: 'Dispensador de jabón y champú', category: 'Aseo y Baño', standardQty: 1 }
 ];
 
+// LISTA OFICIAL DE HABITACIONES DEL HOTEL RECINTO QUIRAMA (COMFENALCO)
+const QUIRAMA_OFFICIAL_ROOMS = [
+  // Bloque A (7 habitaciones)
+  { id: 'A1', name: 'A1', block: 'Bloque A', type: 'Estándar Colonial' },
+  { id: 'A2', name: 'A2', block: 'Bloque A', type: 'Estándar Colonial' },
+  { id: 'A3', name: 'A3', block: 'Bloque A', type: 'Estándar Colonial' },
+  { id: 'A4', name: 'A4', block: 'Bloque A', type: 'Estándar Colonial' },
+  { id: 'A5', name: 'A5', block: 'Bloque A', type: 'Estándar Colonial' },
+  { id: 'A6', name: 'A6', block: 'Bloque A', type: 'Estándar Colonial' },
+  { id: 'A7', name: 'A7', block: 'Bloque A', type: 'Estándar Colonial' },
+
+  // Bloque B (8 habitaciones)
+  { id: 'B1', name: 'B1', block: 'Bloque B', type: 'Estándar Colonial' },
+  { id: 'B2', name: 'B2', block: 'Bloque B', type: 'Estándar Colonial' },
+  { id: 'B3', name: 'B3', block: 'Bloque B', type: 'Estándar Colonial' },
+  { id: 'B4', name: 'B4', block: 'Bloque B', type: 'Estándar Colonial' },
+  { id: 'B5', name: 'B5', block: 'Bloque B', type: 'Estándar Colonial' },
+  { id: 'B6', name: 'B6', block: 'Bloque B', type: 'Estándar Colonial' },
+  { id: 'B7', name: 'B7', block: 'Bloque B', type: 'Estándar Colonial' },
+  { id: 'B8', name: 'B8', block: 'Bloque B', type: 'Estándar Colonial' },
+
+  // Bloque C (8 habitaciones)
+  { id: 'C1', name: 'C1', block: 'Bloque C', type: 'Estándar Colonial' },
+  { id: 'C2', name: 'C2', block: 'Bloque C', type: 'Estándar Colonial' },
+  { id: 'C3', name: 'C3', block: 'Bloque C', type: 'Estándar Colonial' },
+  { id: 'C4', name: 'C4', block: 'Bloque C', type: 'Estándar Colonial' },
+  { id: 'C5', name: 'C5', block: 'Bloque C', type: 'Estándar Colonial' },
+  { id: 'C6', name: 'C6', block: 'Bloque C', type: 'Estándar Colonial' },
+  { id: 'C7', name: 'C7', block: 'Bloque C', type: 'Estándar Colonial' },
+  { id: 'C8', name: 'C8', block: 'Bloque C', type: 'Estándar Colonial' },
+
+  // Bloque D (8 habitaciones)
+  { id: 'D1', name: 'D1', block: 'Bloque D', type: 'Estándar Colonial' },
+  { id: 'D2', name: 'D2', block: 'Bloque D', type: 'Estándar Colonial' },
+  { id: 'D3', name: 'D3', block: 'Bloque D', type: 'Estándar Colonial' },
+  { id: 'D4', name: 'D4', block: 'Bloque D', type: 'Estándar Colonial' },
+  { id: 'D5', name: 'D5', block: 'Bloque D', type: 'Estándar Colonial' },
+  { id: 'D6', name: 'D6', block: 'Bloque D', type: 'Estándar Colonial' },
+  { id: 'D7', name: 'D7', block: 'Bloque D', type: 'Estándar Colonial' },
+  { id: 'D8', name: 'D8', block: 'Bloque D', type: 'Estándar Colonial' },
+
+  // Casita E (5 habitaciones)
+  { id: 'E1', name: 'E1', block: 'Casita E', type: 'Casita Campestre' },
+  { id: 'E2', name: 'E2', block: 'Casita E', type: 'Casita Campestre' },
+  { id: 'E3', name: 'E3', block: 'Casita E', type: 'Casita Campestre' },
+  { id: 'E4', name: 'E4', block: 'Casita E', type: 'Casita Campestre' },
+  { id: 'E5', name: 'E5', block: 'Casita E', type: 'Casita Campestre' },
+
+  // Casita F (5 habitaciones)
+  { id: 'F1', name: 'F1', block: 'Casita F', type: 'Casita Campestre' },
+  { id: 'F2', name: 'F2', block: 'Casita F', type: 'Casita Campestre' },
+  { id: 'F3', name: 'F3', block: 'Casita F', type: 'Casita Campestre' },
+  { id: 'F4', name: 'F4', block: 'Casita F', type: 'Casita Campestre' },
+  { id: 'F5', name: 'F5', block: 'Casita F', type: 'Casita Campestre' },
+
+  // Casita G (7 habitaciones: G1, G2, G3, G5, G6, G7, G8)
+  { id: 'G1', name: 'G1', block: 'Casita G', type: 'Casita Campestre' },
+  { id: 'G2', name: 'G2', block: 'Casita G', type: 'Casita Campestre' },
+  { id: 'G3', name: 'G3', block: 'Casita G', type: 'Casita Campestre' },
+  { id: 'G5', name: 'G5', block: 'Casita G', type: 'Casita Campestre' },
+  { id: 'G6', name: 'G6', block: 'Casita G', type: 'Casita Campestre' },
+  { id: 'G7', name: 'G7', block: 'Casita G', type: 'Casita Campestre' },
+  { id: 'G8', name: 'G8', block: 'Casita G', type: 'Casita Campestre' },
+
+  // Casita H (5 habitaciones)
+  { id: 'H1', name: 'H1', block: 'Casita H', type: 'Casita Campestre' },
+  { id: 'H2', name: 'H2', block: 'Casita H', type: 'Casita Campestre' },
+  { id: 'H3', name: 'H3', block: 'Casita H', type: 'Casita Campestre' },
+  { id: 'H4', name: 'H4', block: 'Casita H', type: 'Casita Campestre' },
+  { id: 'H5', name: 'H5', block: 'Casita H', type: 'Casita Campestre' },
+
+  // Casita I (3 habitaciones)
+  { id: 'I1', name: 'I1', block: 'Casita I', type: 'Casita Campestre' },
+  { id: 'I2', name: 'I2', block: 'Casita I', type: 'Casita Campestre' },
+  { id: 'I3', name: 'I3', block: 'Casita I', type: 'Casita Campestre' }
+];
+
 const DEFAULT_SETTINGS = {
   hotelName: 'Hotel Recinto Quirama',
   entityName: 'Comfenalco Antioquia',
   department: 'Departamento de Ama de Llaves y Habitaciones',
   location: 'El Carmen de Viboral - Rionegro, Antioquia',
   logo: null,
-  roomCount: 60,
-  numbering: '101-160',
   catalog: DEFAULT_CATALOG
 };
 
@@ -46,11 +121,11 @@ const DEFAULT_SETTINGS = {
 // ==============================================================
 let appSettings = {};
 let appRooms = {};
-let currentRoomId = '101';
+let currentRoomId = 'A1';
 let currentSearchTerm = '';
 
-const STORAGE_SETTINGS_KEY = 'quirama_hotel_settings_v4';
-const STORAGE_ROOMS_KEY = 'quirama_hotel_rooms_v4';
+const STORAGE_SETTINGS_KEY = 'quirama_hotel_settings_v5';
+const STORAGE_ROOMS_KEY = 'quirama_hotel_rooms_v5';
 
 // ==============================================================
 // 3. INICIALIZACIÓN
@@ -75,9 +150,14 @@ function initLucide() {
   }
 }
 
+function safeUpper(str, fallback = '') {
+  if (typeof str !== 'string' || !str) return fallback;
+  return str.toUpperCase();
+}
+
 function loadSettings() {
   try {
-    const saved = localStorage.getItem(STORAGE_SETTINGS_KEY) || localStorage.getItem('quirama_hotel_settings_v3');
+    const saved = localStorage.getItem(STORAGE_SETTINGS_KEY) || localStorage.getItem('quirama_hotel_settings_v4');
     if (saved) {
       appSettings = { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
     } else {
@@ -97,11 +177,6 @@ function saveSettingsToStorage() {
   } catch (e) {
     console.error('Error guardando ajustes:', e);
   }
-}
-
-function safeUpper(str, fallback = '') {
-  if (typeof str !== 'string' || !str) return fallback;
-  return str.toUpperCase();
 }
 
 function applySettingsToUI() {
@@ -133,17 +208,18 @@ function applySettingsToUI() {
   if (printDept) printDept.textContent = safeUpper(appSettings.department, 'DEPARTAMENTO DE AMA DE LLAVES');
 }
 
+// Carga las habitaciones oficiales de Recinto Quirama
 function loadRooms() {
   try {
-    const saved = localStorage.getItem(STORAGE_ROOMS_KEY) || localStorage.getItem('quirama_hotel_rooms_v3');
+    const saved = localStorage.getItem(STORAGE_ROOMS_KEY);
     if (saved) {
       appRooms = JSON.parse(saved);
     } else {
-      generateInitialRooms();
+      generateOfficialQuiramaRooms();
     }
   } catch (e) {
     console.error('Error cargando habitaciones:', e);
-    generateInitialRooms();
+    generateOfficialQuiramaRooms();
   }
 
   const roomKeys = Object.keys(appRooms);
@@ -152,19 +228,15 @@ function loadRooms() {
   }
 }
 
-function generateInitialRooms() {
+function generateOfficialQuiramaRooms() {
   appRooms = {};
-  const total = appSettings.roomCount || 60;
-  const startNum = (appSettings.numbering === '1-60') ? 1 : 101;
-
-  for (let i = 0; i < total; i++) {
-    const num = String(startNum + i);
-    appRooms[num] = createEmptyRoom(num);
-  }
+  QUIRAMA_OFFICIAL_ROOMS.forEach(def => {
+    appRooms[def.id] = createRoomInstance(def.id, def.name, def.block, def.type);
+  });
   saveRoomsToStorage();
 }
 
-function createEmptyRoom(num) {
+function createRoomInstance(id, name, block, type) {
   const catalog = appSettings.catalog || DEFAULT_CATALOG;
   const items = catalog.map((item, idx) => ({
     id: `item-${Date.now()}-${idx}-${Math.floor(Math.random() * 1000)}`,
@@ -176,15 +248,11 @@ function createEmptyRoom(num) {
     observation: ''
   }));
 
-  let type = 'Estándar Colonial';
-  const n = parseInt(num, 10);
-  if (n % 10 === 0) type = 'Suite Quirama';
-  else if (n % 5 === 0) type = 'Cabaña de Lujo';
-  else if (n % 2 === 0) type = 'Doble Familiar';
-
   return {
-    id: num,
-    type: type,
+    id: id,
+    name: name || id,
+    block: block || 'General',
+    type: type || 'Estándar Colonial',
     housekeeper: '',
     auditor: '',
     date: new Date().toISOString().slice(0, 16),
@@ -209,8 +277,11 @@ function syncCurrentRoomFromDOM() {
   const room = appRooms[currentRoomId];
   if (!room) return;
 
-  const typeInput = document.getElementById('room-type-input');
-  if (typeInput) room.type = typeInput.value;
+  const nameInput = document.getElementById('room-name-input');
+  if (nameInput) room.name = nameInput.value.trim() || room.id;
+
+  const blockInput = document.getElementById('room-block-input');
+  if (blockInput) room.block = blockInput.value.trim() || 'General';
 
   const hkInput = document.getElementById('room-housekeeper-input');
   if (hkInput) room.housekeeper = hkInput.value.trim();
@@ -235,7 +306,6 @@ function saveCurrentRoomManual() {
     updateGlobalStats();
     renderActiveRoom();
 
-    // Animación y confirmación en el botón Guardar
     const saveBtn = document.getElementById('btn-save-room');
     if (saveBtn) {
       const originalHTML = saveBtn.innerHTML;
@@ -255,33 +325,68 @@ function saveCurrentRoomManual() {
       }, 2000);
     }
 
-    showToast(`✅ Habitación ${currentRoomId} guardada con éxito`, 'success');
+    const room = appRooms[currentRoomId];
+    showToast(`✅ ${room.name || currentRoomId} (${room.block}) guardada`, 'success');
   } catch (err) {
-    console.error('Error guardando habitación:', err);
-    alert('Ocurrió un error al guardar: ' + err.message);
+    console.error('Error guardando:', err);
+    alert('Error al guardar: ' + err.message);
   }
 }
 
+// Edición en vivo del nombre y bloque desde la tarjeta principal
+function updateCurrentRoomName(newName) {
+  const room = appRooms[currentRoomId];
+  if (!room) return;
+  room.name = newName.trim() || room.id;
+  saveRoomsToStorage();
+  populateRoomSelect();
+}
+
+function updateCurrentRoomBlock(newBlock) {
+  const room = appRooms[currentRoomId];
+  if (!room) return;
+  room.block = newBlock.trim() || 'General';
+  saveRoomsToStorage();
+  populateRoomSelect();
+}
+
 // ==============================================================
-// 5. NAVEGACIÓN Y CONTROL DE HABITACIÓN ACTIVA
+// 5. NAVEGACIÓN Y SELECTOR AGRUPADO POR BLOQUES Y CASITAS
 // ==============================================================
 function populateRoomSelect() {
   const select = document.getElementById('room-select');
   if (!select) return;
 
   select.innerHTML = '';
-  const roomIds = Object.keys(appRooms).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
 
-  roomIds.forEach(id => {
-    const opt = document.createElement('option');
-    opt.value = id;
+  // Agrupar habitaciones por bloque
+  const groups = {};
+  Object.keys(appRooms).forEach(id => {
     const r = appRooms[id];
-    let icon = '⚪';
-    if (r.status === 'ok') icon = '🟢';
-    else if (r.status === 'warn') icon = '🟡';
-    opt.textContent = `${icon} Habitación ${id} (${r.type})`;
-    if (id === currentRoomId) opt.selected = true;
-    select.appendChild(opt);
+    const b = r.block || 'General';
+    if (!groups[b]) groups[b] = [];
+    groups[b].push(r);
+  });
+
+  // Ordenar bloques manteniendo orden de Bloque A-D y Casitas E-I
+  const blockKeys = Object.keys(groups);
+
+  blockKeys.forEach(blockName => {
+    const optgroup = document.createElement('optgroup');
+    optgroup.label = `📍 ${blockName} (${groups[blockName].length})`;
+
+    groups[blockName].forEach(r => {
+      const opt = document.createElement('option');
+      opt.value = r.id;
+      let icon = '⚪';
+      if (r.status === 'ok') icon = '🟢';
+      else if (r.status === 'warn') icon = '🟡';
+      opt.textContent = `${icon} ${r.name || r.id}`;
+      if (r.id === currentRoomId) opt.selected = true;
+      optgroup.appendChild(opt);
+    });
+
+    select.appendChild(optgroup);
   });
 }
 
@@ -300,7 +405,7 @@ function navigateRoom(delta) {
   syncCurrentRoomFromDOM();
   saveRoomsToStorage();
 
-  const roomIds = Object.keys(appRooms).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+  const roomIds = Object.keys(appRooms);
   const currentIndex = roomIds.indexOf(currentRoomId);
   if (currentIndex === -1) return;
 
@@ -323,14 +428,17 @@ function setCurrentDateTime() {
 }
 
 // ==============================================================
-// 6. RENDERIZADO DE TABLA DE INVENTARIO
+// 6. RENDERIZADO DE HABITACIÓN ACTIVA Y TABLA
 // ==============================================================
 function renderActiveRoom() {
   const room = appRooms[currentRoomId];
   if (!room) return;
 
-  const typeInput = document.getElementById('room-type-input');
-  if (typeInput) typeInput.value = room.type || 'Estándar Colonial';
+  const nameInput = document.getElementById('room-name-input');
+  if (nameInput) nameInput.value = room.name || room.id;
+
+  const blockInput = document.getElementById('room-block-input');
+  if (blockInput) blockInput.value = room.block || 'General';
 
   const hkInput = document.getElementById('room-housekeeper-input');
   if (hkInput) hkInput.value = room.housekeeper || '';
@@ -457,7 +565,7 @@ function renderItemsTable(room) {
 
       <td class="py-3.5 px-3 text-center">
         <button type="button" onclick="deleteItem('${item.id}')" 
-          class="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition" title="Eliminar artículo de esta habitación">
+          class="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition" title="Eliminar artículo">
           <i data-lucide="trash-2" class="w-4 h-4"></i>
         </button>
       </td>
@@ -559,13 +667,13 @@ function deleteItem(itemId) {
   const item = room.items.find(i => i.id === itemId);
   const itemName = item ? item.name : 'este artículo';
 
-  if (!confirm(`¿Eliminar "${itemName}" de la Habitación ${currentRoomId}?`)) return;
+  if (!confirm(`¿Eliminar "${itemName}" de ${room.name || room.id}?`)) return;
 
   room.items = room.items.filter(i => i.id !== itemId);
   recalculateRoomStatus(room);
   saveRoomsToStorage();
   renderActiveRoom();
-  showToast(`Artículo eliminado de la Habitación ${currentRoomId}`, 'info');
+  showToast(`Artículo eliminado de ${room.name || room.id}`, 'info');
 }
 
 function recalculateRoomStatus(room) {
@@ -622,11 +730,13 @@ function updateRoomCounters(room) {
 }
 
 function updateGlobalStats() {
-  let totalRooms = Object.keys(appRooms).length;
+  const roomKeys = Object.keys(appRooms);
+  let totalRooms = roomKeys.length;
   let okRooms = 0;
   let warnRooms = 0;
 
-  Object.values(appRooms).forEach(r => {
+  roomKeys.forEach(id => {
+    const r = appRooms[id];
     if (r.status === 'ok') okRooms++;
     else if (r.status === 'warn') warnRooms++;
   });
@@ -654,7 +764,7 @@ function resetCurrentRoomToStandard() {
   const room = appRooms[currentRoomId];
   if (!room) return;
 
-  if (!confirm(`¿Restablecer inventario de la Habitación ${currentRoomId} a los valores estándar?`)) return;
+  if (!confirm(`¿Restablecer inventario de ${room.name || room.id} a los valores estándar?`)) return;
 
   const catalog = appSettings.catalog || DEFAULT_CATALOG;
   room.items = catalog.map((item, idx) => ({
@@ -670,7 +780,7 @@ function resetCurrentRoomToStandard() {
   recalculateRoomStatus(room);
   saveRoomsToStorage();
   renderActiveRoom();
-  showToast(`Habitación ${currentRoomId} restablecida`, 'success');
+  showToast(`${room.name || room.id} restablecida`, 'success');
 }
 
 // ==============================================================
@@ -700,7 +810,256 @@ function directExportPDF() {
 }
 
 // ==============================================================
-// 9. MODAL: CONFIGURAR DOCUMENTO DE IMPRESIÓN, PDF Y FIRMAS
+// 9. MODAL: ADMINISTRADOR DE HABITACIONES (RENOMBRAR / EDITAR)
+// ==============================================================
+function openManageRoomsModal() {
+  const modal = document.getElementById('modal-manage-rooms');
+  if (!modal) return;
+
+  renderManageRoomsTable();
+  modal.classList.remove('hidden');
+  initLucide();
+}
+
+function closeManageRoomsModal() {
+  const modal = document.getElementById('modal-manage-rooms');
+  if (modal) modal.classList.add('hidden');
+  populateRoomSelect();
+  renderActiveRoom();
+  updateGlobalStats();
+}
+
+function renderManageRoomsTable() {
+  const tbody = document.getElementById('manage-rooms-tbody');
+  const countEl = document.getElementById('manage-rooms-count');
+  if (!tbody) return;
+
+  tbody.innerHTML = '';
+  const roomKeys = Object.keys(appRooms);
+  if (countEl) countEl.textContent = roomKeys.length;
+
+  roomKeys.forEach(id => {
+    const r = appRooms[id];
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-slate-50';
+
+    tr.innerHTML = `
+      <td class="py-2 px-3">
+        <input type="text" value="${escapeHTML(r.block || 'General')}" 
+          onchange="changeRoomBlockFromTable('${id}', this.value)"
+          class="w-full bg-white border border-slate-200 rounded p-1 font-bold text-xs text-brand-900">
+      </td>
+      <td class="py-2 px-3">
+        <input type="text" value="${escapeHTML(r.name || r.id)}" 
+          onchange="changeRoomNameFromTable('${id}', this.value)"
+          class="w-full bg-white border border-slate-200 rounded p-1 font-black text-xs text-slate-900">
+      </td>
+      <td class="py-2 px-3">
+        <select onchange="changeRoomTypeFromTable('${id}', this.value)" class="w-full bg-white border border-slate-200 rounded p-1 text-xs">
+          <option value="Estándar Colonial" ${r.type === 'Estándar Colonial' ? 'selected' : ''}>Estándar Colonial</option>
+          <option value="Casita Campestre" ${r.type === 'Casita Campestre' ? 'selected' : ''}>Casita Campestre</option>
+          <option value="Doble Familiar" ${r.type === 'Doble Familiar' ? 'selected' : ''}>Doble Familiar</option>
+          <option value="Suite Quirama" ${r.type === 'Suite Quirama' ? 'selected' : ''}>Suite Quirama</option>
+        </select>
+      </td>
+      <td class="py-2 px-3 text-center">
+        <button type="button" onclick="handleDeleteRoom('${id}')" class="text-red-500 hover:text-red-700 p-1" title="Eliminar habitación">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  initLucide();
+}
+
+function changeRoomNameFromTable(id, newName) {
+  if (appRooms[id]) {
+    appRooms[id].name = newName.trim() || id;
+    saveRoomsToStorage();
+  }
+}
+
+function changeRoomBlockFromTable(id, newBlock) {
+  if (appRooms[id]) {
+    appRooms[id].block = newBlock.trim() || 'General';
+    saveRoomsToStorage();
+  }
+}
+
+function changeRoomTypeFromTable(id, newType) {
+  if (appRooms[id]) {
+    appRooms[id].type = newType;
+    saveRoomsToStorage();
+  }
+}
+
+function handleAddNewRoom() {
+  const blockIn = document.getElementById('new-room-block');
+  const idIn = document.getElementById('new-room-id');
+  const typeIn = document.getElementById('new-room-type');
+
+  const block = blockIn ? blockIn.value : 'Bloque A';
+  const id = idIn ? idIn.value.trim().toUpperCase() : '';
+  const type = typeIn ? typeIn.value : 'Estándar Colonial';
+
+  if (!id) {
+    alert('Por favor digita un código o nombre para la habitación (ej. G4, I4, Suite 1).');
+    return;
+  }
+
+  if (appRooms[id]) {
+    alert(`La habitación con identificador "${id}" ya existe.`);
+    return;
+  }
+
+  appRooms[id] = createRoomInstance(id, id, block, type);
+  saveRoomsToStorage();
+  if (idIn) idIn.value = '';
+  renderManageRoomsTable();
+  populateRoomSelect();
+  showToast(`Habitación ${id} agregada al ${block}`, 'success');
+}
+
+function handleDeleteRoom(id) {
+  const r = appRooms[id];
+  const name = r ? (r.name || id) : id;
+  if (Object.keys(appRooms).length <= 1) {
+    alert('Debe existir al menos una habitación en el sistema.');
+    return;
+  }
+
+  if (!confirm(`¿Eliminar la habitación "${name}"? Se perderán sus inventarios registrados.`)) return;
+
+  delete appRooms[id];
+  if (currentRoomId === id) {
+    currentRoomId = Object.keys(appRooms)[0];
+  }
+  saveRoomsToStorage();
+  renderManageRoomsTable();
+  populateRoomSelect();
+  renderActiveRoom();
+  showToast(`Habitación ${name} eliminada`, 'info');
+}
+
+function restoreQuiramaOfficialRooms() {
+  if (!confirm('¿Restablecer las habitaciones a la distribución oficial del Hotel Recinto Quirama (Bloques A, B, C, D y Casitas E, F, G, H, I)?')) {
+    return;
+  }
+  generateOfficialQuiramaRooms();
+  currentRoomId = 'A1';
+  renderManageRoomsTable();
+  populateRoomSelect();
+  renderActiveRoom();
+  updateGlobalStats();
+  showToast('Distribución oficial de Quirama restablecida con éxito', 'success');
+}
+
+// ==============================================================
+// 10. MODAL: MATRIZ DE HABITACIONES POR BLOQUES Y CASITAS
+// ==============================================================
+function openRoomMatrixModal() {
+  const modal = document.getElementById('modal-matrix');
+  const container = document.getElementById('room-matrix-container');
+  if (!modal || !container) return;
+
+  container.innerHTML = '';
+
+  // Agrupar habitaciones por bloque
+  const groups = {};
+  Object.keys(appRooms).forEach(id => {
+    const r = appRooms[id];
+    const b = r.block || 'General';
+    if (!groups[b]) groups[b] = [];
+    groups[b].push(r);
+  });
+
+  Object.keys(groups).forEach(blockName => {
+    const roomsInBlock = groups[blockName];
+    let okCount = 0;
+    let warnCount = 0;
+
+    roomsInBlock.forEach(r => {
+      if (r.status === 'ok') okCount++;
+      else if (r.status === 'warn') warnCount++;
+    });
+
+    const blockCard = document.createElement('div');
+    blockCard.className = 'bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3';
+
+    blockCard.innerHTML = `
+      <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-brand-600"></span>
+          <h3 class="text-sm font-black text-brand-900 uppercase tracking-wider">${escapeHTML(blockName)}</h3>
+          <span class="text-xs font-bold text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200">
+            Subtotal: ${roomsInBlock.length} habitaciones
+          </span>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-bold">
+          <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">OK: ${okCount}</span>
+          <span class="text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">Novedad: ${warnCount}</span>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-8 gap-2.5" id="grid-${escapeHTML(blockName).replace(/\s+/g, '-')}">
+      </div>
+    `;
+
+    const grid = blockCard.querySelector(`[id^="grid-"]`);
+    roomsInBlock.forEach(r => {
+      const tile = document.createElement('div');
+      tile.className = 'room-grid-tile rounded-xl p-2.5 border text-center flex flex-col items-center justify-between gap-1 shadow-sm';
+
+      let bgClass = 'bg-white border-slate-200 text-slate-700';
+      let statusDot = 'bg-slate-400';
+      let statusText = 'Sin revisar';
+
+      if (r.status === 'ok') {
+        bgClass = 'bg-emerald-50 border-emerald-400 text-emerald-950 font-bold';
+        statusDot = 'bg-brand-600';
+        statusText = 'Conforme';
+      } else if (r.status === 'warn') {
+        bgClass = 'bg-amber-50 border-amber-300 text-amber-900 font-bold';
+        statusDot = 'bg-amber-500';
+        statusText = 'Novedades';
+      }
+
+      tile.className += ` ${bgClass}`;
+      if (r.id === currentRoomId) {
+        tile.classList.add('active-room');
+      }
+
+      tile.innerHTML = `
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">${escapeHTML(r.block)}</div>
+        <div class="text-base font-black tracking-tight text-brand-950">${escapeHTML(r.name || r.id)}</div>
+        <div class="flex items-center gap-1 text-[9.5px] font-bold">
+          <span class="w-2 h-2 rounded-full ${statusDot}"></span>
+          <span>${statusText}</span>
+        </div>
+      `;
+
+      tile.onclick = () => {
+        changeActiveRoom(r.id);
+        closeRoomMatrixModal();
+      };
+
+      grid.appendChild(tile);
+    });
+
+    container.appendChild(blockCard);
+  });
+
+  modal.classList.remove('hidden');
+  initLucide();
+}
+
+function closeRoomMatrixModal() {
+  const modal = document.getElementById('modal-matrix');
+  if (modal) modal.classList.add('hidden');
+}
+
+// ==============================================================
+// 11. CONFIGURACIÓN DE IMPRESIÓN, PDF Y FIRMAS
 // ==============================================================
 function openPrintModal() {
   try {
@@ -750,7 +1109,7 @@ function updatePrintPreview() {
     const printable = document.getElementById('printable-report');
     if (!printable) return;
 
-    // 1. Tamaño de la letra
+    // 1. Tamaño de letra
     const fontSizeSelect = document.getElementById('doc-font-size');
     const selectedSize = fontSizeSelect ? fontSizeSelect.value : 'report-font-large';
     printable.classList.remove('report-font-large', 'report-font-xlarge', 'report-font-normal');
@@ -779,10 +1138,10 @@ function updatePrintPreview() {
 
     // 3. Datos de la Habitación
     const roomNum = document.getElementById('print-room-number');
-    if (roomNum) roomNum.textContent = room.id;
+    if (roomNum) roomNum.textContent = room.name || room.id;
 
     const roomType = document.getElementById('print-room-type');
-    if (roomType) roomType.textContent = room.type || 'Estándar';
+    if (roomType) roomType.textContent = `${room.block || 'General'} · ${room.type || 'Estándar'}`;
 
     const roomDate = document.getElementById('print-room-date');
     if (roomDate) {
@@ -804,7 +1163,7 @@ function updatePrintPreview() {
       }
     }
 
-    // 4. Modo de Contenido de la Tabla (Todo vs Solo Novedades)
+    // 4. Tabla de Ítems
     const modeSelect = document.getElementById('doc-content-mode');
     const onlyIssues = modeSelect && modeSelect.value === 'only-issues';
 
@@ -821,7 +1180,7 @@ function updatePrintPreview() {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td colspan="5" style="text-align: center; padding: 25px; font-size: 13pt; font-weight: bold; color: #008848;">
-            ✅ Toda la dotación de la Habitación ${room.id} se encuentra completa y en perfecto estado (Sin novedades).
+            ✅ Toda la dotación de ${room.name || room.id} (${room.block}) se encuentra completa y en perfecto estado.
           </td>
         `;
         tbody.appendChild(tr);
@@ -857,7 +1216,7 @@ function updatePrintPreview() {
       }
     }
 
-    // 5. Observaciones del Documento
+    // 5. Observaciones
     const notesIn = document.getElementById('doc-notes-input');
     const printNotes = document.getElementById('print-room-notes');
     if (printNotes) {
@@ -913,17 +1272,17 @@ function executePDFExport() {
   try {
     updatePrintPreview();
     const element = document.getElementById('printable-report');
-    if (!element) {
-      alert('Error: no se encontró el reporte.');
-      return;
-    }
+    if (!element) return;
 
     showToast('Generando documento PDF...', 'info');
     element.style.display = 'block';
 
+    const room = appRooms[currentRoomId];
+    const safeRoomName = (room ? (room.name || room.id) : currentRoomId).replace(/[^a-zA-Z0-9_-]/g, '_');
+
     const opt = {
       margin: [8, 8, 8, 8],
-      filename: `Inventario_Habitacion_${currentRoomId}_Quirama.pdf`,
+      filename: `Inventario_${safeRoomName}_Recinto_Quirama.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true, logging: false },
       jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
@@ -962,11 +1321,14 @@ function executeImageExport() {
     showToast('Generando imagen de alta resolución...', 'info');
     element.style.display = 'block';
 
+    const room = appRooms[currentRoomId];
+    const safeRoomName = (room ? (room.name || room.id) : currentRoomId).replace(/[^a-zA-Z0-9_-]/g, '_');
+
     if (typeof html2canvas !== 'undefined') {
       html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
         element.style.display = 'none';
         const link = document.createElement('a');
-        link.download = `Inventario_Habitacion_${currentRoomId}_Quirama.png`;
+        link.download = `Inventario_${safeRoomName}_Quirama.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
         showToast('¡Imagen descargada con éxito!', 'success');
@@ -985,7 +1347,7 @@ function executeImageExport() {
 }
 
 // ==============================================================
-// 10. MODAL: AGREGAR ELEMENTO
+// 12. MODAL: AGREGAR ELEMENTO AL INVENTARIO
 // ==============================================================
 function openAddItemModal() {
   const modal = document.getElementById('modal-add-item');
@@ -1052,9 +1414,9 @@ function handleAddItemSubmit(e) {
         });
       }
     });
-    showToast(`Elemento agregado a las 60 habitaciones`, 'success');
+    showToast(`Elemento agregado a todas las habitaciones`, 'success');
   } else {
-    showToast(`Elemento agregado a Habitación ${currentRoomId}`, 'success');
+    showToast(`Elemento agregado a ${room.name || currentRoomId}`, 'success');
   }
 
   saveRoomsToStorage();
@@ -1063,68 +1425,7 @@ function handleAddItemSubmit(e) {
 }
 
 // ==============================================================
-// 11. MODAL: MATRIZ DE 60 HABITACIONES
-// ==============================================================
-function openRoomMatrixModal() {
-  const modal = document.getElementById('modal-matrix');
-  const container = document.getElementById('room-matrix-container');
-  if (!modal || !container) return;
-
-  container.innerHTML = '';
-  const roomIds = Object.keys(appRooms).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
-
-  roomIds.forEach(id => {
-    const room = appRooms[id];
-    const tile = document.createElement('div');
-    tile.className = 'room-grid-tile rounded-xl p-3 border text-center flex flex-col items-center justify-between gap-1';
-
-    let bgClass = 'bg-slate-50 border-slate-200 text-slate-700';
-    let statusDot = 'bg-slate-400';
-    let statusText = 'Sin revisar';
-
-    if (room.status === 'ok') {
-      bgClass = 'bg-emerald-50 border-emerald-400 text-emerald-950 font-bold';
-      statusDot = 'bg-brand-600';
-      statusText = 'Conforme';
-    } else if (room.status === 'warn') {
-      bgClass = 'bg-amber-50 border-amber-300 text-amber-900 font-bold';
-      statusDot = 'bg-amber-500';
-      statusText = 'Novedades';
-    }
-
-    tile.className += ` ${bgClass}`;
-    if (id === currentRoomId) {
-      tile.classList.add('active-room');
-    }
-
-    tile.innerHTML = `
-      <div class="text-[11px] font-bold text-slate-400">HAB</div>
-      <div class="text-lg font-black tracking-tight">${id}</div>
-      <div class="flex items-center gap-1 text-[10px] font-bold">
-        <span class="w-2.5 h-2.5 rounded-full ${statusDot}"></span>
-        <span>${statusText}</span>
-      </div>
-    `;
-
-    tile.onclick = () => {
-      changeActiveRoom(id);
-      closeRoomMatrixModal();
-    };
-
-    container.appendChild(tile);
-  });
-
-  modal.classList.remove('hidden');
-  initLucide();
-}
-
-function closeRoomMatrixModal() {
-  const modal = document.getElementById('modal-matrix');
-  if (modal) modal.classList.add('hidden');
-}
-
-// ==============================================================
-// 12. MODAL DE AJUSTES GENERALES & LOGOTIPO
+// 13. MODAL DE AJUSTES GENERALES & LOGOTIPO
 // ==============================================================
 function openSettingsModal() {
   const modal = document.getElementById('modal-settings');
@@ -1168,7 +1469,7 @@ function resetDefaultLogo() {
 
 function exportBackupData() {
   const backupObject = {
-    version: '4.0',
+    version: '5.0',
     exportDate: new Date().toISOString(),
     hotel: appSettings.hotelName,
     settings: appSettings,
@@ -1215,7 +1516,7 @@ function importBackupData(event) {
 }
 
 // ==============================================================
-// 13. UTILIDADES Y NOTIFICACIONES
+// 14. UTILIDADES Y NOTIFICACIONES
 // ==============================================================
 function escapeHTML(str) {
   if (!str) return '';
